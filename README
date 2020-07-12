@@ -1,0 +1,34 @@
+!!!!THIS IS AN EXPERMENT!!!!!!
+!!!DO NOT USE IN PRODUCTION!!!
+
+
+The service user runs a simple Wayland server using PAM, it reports itself as a 'greeter' (as it's technically 
+graphical in how it interacts with the OS, (over TTY)) instead of TTY. 
+Also the single display server runs a full screen program.
+
+- A disconnected 'tmux' session where the login binary runs under. tmux is used as it can emulate /dev/pts/x and can run
+  as root, and can be utmp'd for login to work. Many settings in a custom config file had to be turned OFF though, as 
+  the panels and the multisessions and windows are too much to be exposed to emulate a login TTY. (as well as the 
+  status bar)
+
+- 'cage' is a display server that comes close to what is needed, it runs one program full screen. And exits when the one
+  program quits, IT quits too, which is very helpful. It's like wl_fullscreen, but doesn't need a custom protocol. And
+  it's built on wlroots, so it had good support. 
+
+- 'alacritty' is a decent enough Terminal Emulator. It doesn't have auto link detection, which is GOOD because it's a
+  used as a kiosk. No preferences panels, or context menus that can open a file browser window, etc.
+
+- A 'tmux' connection *client* runs in alacritty, as the user, (which has permissons granted). This is so that the login
+  session running as root, needs no SETUID, and so that these UI programs don't run as root.
+  Also, since the shell running in the cage session is actually running in tmux, users cannot start graphical programs
+  by mistake in the display server, as they don't have permissions, or the WAYLAND_DISPLAY in their environment.
+
+- It needs /dev/dri/card0 but if there isn't, it falls back to legacy.
+
+Problems:
+  FBDEV only systems won't work. Whereas 'weston' has fbdev, but doesn't have the special features like 'cage'.
+     There are some cards that don't even have fbdev. Odd that there is no VESA-like Kernel Mode Setting driver yet.
+     If there is no /dev/dri/card0 then it will fall back
+  Sessions won't appear as the user in loginctl, and instead appear as the 'vtty-frontend' user.
+  alacritty is rarely packaged, (and needs rust to build)
+  cage is rarely packaged
