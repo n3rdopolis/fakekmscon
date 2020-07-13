@@ -1,5 +1,5 @@
 scrolling:
-  history: 1000
+  history: 10000
   multiplier: 3
   faux_multiplier: 3
 
