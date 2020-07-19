@@ -15,10 +15,10 @@ Also the single display server runs a full screen program.
   program quits, IT quits too, which is very helpful. It's like wl_fullscreen, but doesn't need a custom protocol. And
   it's built on wlroots, so it had good support. 
 
-- 'alacritty' is a decent enough Terminal Emulator. It doesn't have auto link detection, which is GOOD because it's a
-  used as a kiosk. No preferences panels, or context menus that can open a file browser window, etc.
+- 'vte' is the terminal emulator used, it supports options to make it not support opening links, have any menus, or titlebars
+  as it's being used as a kiosk here
 
-- A 'tmux' connection *client* runs in alacritty, as the user, (which has permissons granted). This is so that the login
+- A 'tmux' connection *client* runs in vte, as the user, (which has permissons granted). This is so that the login
   session running as root, needs no SETUID, and so that these UI programs don't run as root.
   Also, since the shell running in the cage session is actually running in tmux, users cannot start graphical programs
   by mistake in the display server, as they don't have permissions, or the WAYLAND_DISPLAY in their environment.
@@ -30,5 +30,5 @@ Problems:
      There are some cards that don't even have fbdev. Odd that there is no VESA-like Kernel Mode Setting driver yet.
      If there is no /dev/dri/card0 then it will fall back
   Sessions won't appear as the user in loginctl, and instead appear as the 'vtty-frontend' user.
-  alacritty is rarely packaged, (and needs rust to build)
+  needs a new version of `vte` that supports `--no-titlebar`
   cage is rarely packaged

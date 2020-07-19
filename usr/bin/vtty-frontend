@@ -1,7 +1,10 @@
 #! /bin/bash
+#This runs a graphical terminal full screen to connect to the tmux sessions that run the login prompt
+
 . /usr/bin/wlruntime_vars &> /dev/null
 
 EmulatedTTY=$1
+export HOME=/etc/vtty-config
 
 which tmux &> /dev/null
 if [[ $? != 0 ]]
@@ -10,10 +13,10 @@ then
   exit 1
 fi
 
-which alacritty &> /dev/null
+which vte &> /dev/null
 if [[ $? != 0 ]]
 then
-  echo "alacritty not installed"
+  echo "vte not installed"
   exit 1
 fi
 
@@ -23,6 +26,17 @@ then
   echo "cage not installed"
   exit 1
 fi
+
+
+#if vttydisable is specified on the boot command line, fall back to legacy gettys
+read -r -n 16385 -d $'\r' KernelCommandLine </proc/cmdline
+if [[ $KernelCommandLine =~ ([[:space:]]|^)"vttydisable"([[:space:]]|$) ]]
+then
+  echo "vttydisable specified on the command line. Falling back to default getty"
+  exit 1
+fi
+
+
 
 
 #Use bash builtin sleep if availible
@@ -46,6 +60,11 @@ then
     $SLEEPCMD 1
   done
 fi
+cage -d -s -- \
+vte --no-context-menu --no-builtin-dingus --reverse --font=10 --no-hyperlink --cursor-shape=underline --blink=always --encoding=utf8 --scrollback-lines=10000 --no-scrollbar --no-titlebar -- \
+tmux -2u -f /etc/vtty-config/tmux.conf -S /run/vtty/$EmulatedTTY/tmuxsocket attach -t vtty &
+FRONTENDPID=$!
+trap 'kill -15 $FRONTENDPID' 15
+wait $FRONTENDPID
 
-cage -d -- alacritty --config-file /etc/vtty-frontend/alacritty.yml -e tmux -2 -f /etc/vtty-frontend/tmux.conf -S /run/vtty/$EmulatedTTY/tmuxsocket attach -t vtty
 exit 0
