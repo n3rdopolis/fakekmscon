@@ -26,9 +26,12 @@ Also the single display server runs a full screen program.
 - It needs /dev/dri/card0 but if there isn't, it falls back to legacy.
 
 Problems:
-  FBDEV only systems won't work. Whereas 'weston' has fbdev, but doesn't have the special features like 'cage'.
-     There are some cards that don't even have fbdev. Odd that there is no VESA-like Kernel Mode Setting driver yet.
-     If there is no /dev/dri/card0 then it will fall back
-  Sessions won't appear as the user in loginctl, and instead appear as the 'vtty-frontend' user.
-  needs a new version of `vte` that supports `--no-titlebar`
-  cage is rarely packaged
+  - FBDEV only systems won't work. Whereas 'weston' has fbdev, but doesn't have the special features like 'cage'.
+    There are some cards that don't even have fbdev. Odd that there is no VESA-like Kernel Mode Setting driver yet.
+    If there is no /dev/dri/card0 then it will fall back
+  - Sessions won't appear as the user in loginctl, and instead appear as the 'vtty-frontend' user.
+  - needs a new version of `vte` that supports `--no-titlebar`
+  - cage is rarely packaged
+  - /dev/pts/x not in securetty, root logins might not be permitted. (even though sudo is probably better)
+  - The seat-ness of the TTY sessions is lost. pam_systemd doesn't work, while the tmux service can be run in seat0, valid TTYs are expected.
+    a virtual seat could be used... ...but one can't be created without any devices it appears
