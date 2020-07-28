@@ -4,15 +4,13 @@ Before=vtty-frontend@.service
 #Wants=vtty-monitor.service
 
 [Service]
-Restart=always
+Restart=on-failure
 RestartSec=0
 
-ExecStart=/usr/bin/vtty-backend %I
+ExecStart=/usr/libexec/vtty/vtty-backend %I
 Type=notify
 
 IgnoreSIGPIPE=false
-SendSIGHUP=true
-KillMode=process
 
 [Install]
 WantedBy=getty.target
