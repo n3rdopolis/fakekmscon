@@ -32,7 +32,7 @@ Problems:
 
   - Sessions on the TTY number won't appear as the user in loginctl, and instead appear as the 'vtty-frontend' user.
 
-  - needs a new version of `vte` that supports `--no-titlebar` (not released yet, commit fe95bc7af1b0e70c0fc9254d41ed4f15ea0cfbb9)
+  - needs a new version of `vte` that supports `--no-decorations` (not released yet, commit fe95bc7af1b0e70c0fc9254d41ed4f15ea0cfbb9)
     and vte binary not built in all distros
 
   - cage is rarely packaged
