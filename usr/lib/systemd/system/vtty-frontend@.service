@@ -9,6 +9,7 @@ BindsTo=vtty-backend@.service
 
 ConditionPathExists=/dev/tty0
 ConditionPathExists=/dev/%i
+ConditionPathExists=!/run/vtty/%i/vttyinhibit
 
 #Same as default getty service
 IgnoreOnIsolate=true
@@ -16,31 +17,35 @@ Conflicts=rescue.service
 Before=rescue.service
 
 
-#Only way for a failure to be reported is if there is no /dev/dri/card0
-#The ttyserver always returns true
+#This only considers failure if starting the vTTY display server is impossible
+#such as no /dev/dri/card(X) device, or an executable is missing
+#when that happens, it fails back to the legacy console
 OnFailure=getty@%i.service
 
 [Service]
 Environment=XDG_SEAT=seat0
+PAMName=vtty
 
-PAMName=vtty-frontend
 ExecStart=/usr/libexec/vtty/vtty-frontend %I
+Conflicts=getty@%i.service
 
 TTYPath=/dev/%I
 TTYReset=true
+StandardOutput=tty
+StandardInput=tty
 TTYVTDisallocate=true
+
 Restart=on-failure
 RestartSec=0
 
-User=vtty-frontend
 Type=simple
+User=vtty
 
 NoNewPrivileges=true
 ProtectSystem=true
 PrivateTmp=true
 PrivateNetwork=true
 RestrictRealtime=true
-ProtectClock=true
 ProtectHostname=true
 ProtectKernelTunables=true
 RestrictSUIDSGID=true
