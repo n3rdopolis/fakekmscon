@@ -22,10 +22,12 @@ Also the single display server runs a full screen program.
 - It needs /dev/dri/card0 but if there isn't, it falls back to legacy.
 
 Problems:
-  - FBDEV only systems won't work. Linux 5.14 is looking to have simpledrm merged, so this 
+  - FBDEV only systems won't work. Linux 5.14 is looking to have simpledrm merged, so this issue might be a big deal soon.
   
   - Sessions on the TTY number won't appear as the user in loginctl, and instead appear as the 'vtty' user.
 
   - vte binary not built in all distros
 
   - cage is rarely packaged
+
+  - Sometimes after 'chvt X' out of a vTTY, the <enter> key up event never gets sent
