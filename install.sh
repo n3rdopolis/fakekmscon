@@ -24,8 +24,8 @@ cp -r "$SCRIPTFOLDERPATH"/etc/* /etc
 systemctl enable vtty-frontend@.service
 chmod +x /usr/libexec/vtty-backend
 chmod +x /usr/libexec/vtty-frontend
-chmod +x /usr/libexec/vtty-login
-chmod +x /usr/libexec/vtty-connect
+chmod +x /usr/libexec/vtty-be-login
+chmod +x /usr/libexec/vtty-fe-connect
 chmod +x /usr/bin/vtty-toggle
 
 
