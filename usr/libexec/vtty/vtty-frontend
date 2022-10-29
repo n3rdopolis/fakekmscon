@@ -1,5 +1,5 @@
 #! /bin/bash
-#    Copyright (c) 2020, 2021 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#    Copyright (c) 2020 - 2022 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
 #
 #    This file is part of fakekmscon
 #
@@ -113,11 +113,22 @@ fi
 
 ResetTTYMode $EmulatedTTY
 
+export WLR_RENDERER=pixman
 export WLR_RENDERER_ALLOW_SOFTWARE=1
+export WLR_NO_HARDWARE_CURSORS=1
+export WLR_LIBINPUT_NO_DEVICES=1
 export LIBGL_ALWAYS_SOFTWARE=1
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
-cage -d -s -- \
-vte --no-builtin-dingus --reverse --font=10 --no-hyperlink --cursor-shape=block --blink=always --encoding=utf8 --scrollback-lines=10000 --no-scrollbar --no-decorations --sixel -- \
+cage -m extend -d -s -- \
+foot --config=/etc/footkiosk.conf -- \
 /usr/libexec/vtty/vtty-fe-connect $EmulatedTTY &> /var/log/vtty/host_${EmulatedTTY}.log
 
-exit $?
+ReturnCode=$?
+#systemd sends SIGHUP when a service is stopped. Account for this in case systemd sends it to cage first
+#and bash runs long enough to run the command to report failure, causing the service to restart if set to stopped
+#It's unlikely, but account for SIGHUP
+if [[ $ReturnCode != 0 && $ReturnCode != 129 ]]
+then
+  systemd-notify ERRNO=1
+fi
+exit $ReturnCode

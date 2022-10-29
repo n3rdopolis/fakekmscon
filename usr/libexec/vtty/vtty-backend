@@ -1,5 +1,5 @@
 #! /bin/bash
-#    Copyright (c) 2020, 2021 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#    Copyright (c) 2020 - 2022 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
 #
 #    This file is part of fakekmscon
 #
@@ -91,6 +91,20 @@ do
   then
     XSize=${COMMANDDATA[1]}
     YSize=${COMMANDDATA[2]}
+    if [[ ! -e /run/vtty/$EmulatedTTY/loginpty ]]
+    then
+      Retries=0
+      while [[ ! -e /run/vtty/$EmulatedTTY/loginpty ]]
+      do
+        $SLEEPCMD 1
+        ((Retries++))
+        if [[ $Retries -ge 5 ]]
+        then
+          echo "Timed out waiting for the symlink to the PTY being created"
+          break
+        fi
+      done
+    fi
     stty -F /run/vtty/$EmulatedTTY/loginpty rows $XSize cols $YSize
   fi
 

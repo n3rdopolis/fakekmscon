@@ -1,5 +1,5 @@
 #! /bin/bash
-#    Copyright (c) 2020, 2021 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#    Copyright (c) 2020 - 2022 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
 #
 #    This file is part of fakekmscon
 #
@@ -32,11 +32,26 @@ fi
 
 function PtyResizeEvent
 {
+  if [[ ! -e /run/vtty/$EmulatedTTY/ptycommandproxy ]]
+  then
+    Retries=0
+    while [[ ! -e /run/vtty/$EmulatedTTY/ptycommandproxy ]]
+    do
+      $SLEEPCMD 1
+      ((Retries++))
+      if [[ $Retries -ge 5 ]]
+      then
+        return
+      fi
+    done
+  fi
+
+  #Wait for the terminal client to act when SIG_WINCH is sent before getting the size
+  $SLEEPCMD .3
   ClientPTYSize=($(stty size))
   echo "s ${ClientPTYSize[0]} ${ClientPTYSize[1]}" > /run/vtty/$EmulatedTTY/ptycommandproxy
 }
-#Resize events will be rare (it's fullscreen), but probably possible if a screen is swapped
-trap PtyResizeEvent WINCH
+
 
 if [[ -e /run/vtty/$EmulatedTTY/waylandserver ]]
 then
@@ -44,8 +59,12 @@ then
 fi
 ln -s $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY /run/vtty/$EmulatedTTY/waylandserver
 
-PtyResizeEvent
 socat file:$PTYPath,raw,echo=0 unix-connect:/run/vtty/$EmulatedTTY/socatproxy &
+
+#Resize events will be rare (it's fullscreen), but probably possible if a screen is swapped
+trap PtyResizeEvent WINCH
+PtyResizeEvent
+
 while [ 1 ]
 do
   wait $!

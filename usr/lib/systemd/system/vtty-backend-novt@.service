@@ -1,9 +1,7 @@
 [Unit]
+#Single user vtty for non-vt text mode processes that configure the system, such as console-conf
 Description=Session proxy runner for vTTY %I
-Before=vtty-frontend@.service
-
-ConditionPathExists=/dev/tty0
-ConditionPathExists=/dev/%i
+Before=vtty-frontend-novt@.service
 
 [Service]
 Restart=on-failure
@@ -17,5 +15,5 @@ SendSIGHUP=true
 KillMode=process
 
 [Install]
-WantedBy=getty.target
-DefaultInstance=tty1
+WantedBy=multi-user.target
+DefaultInstance=getty0

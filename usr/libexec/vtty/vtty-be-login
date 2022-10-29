@@ -1,5 +1,5 @@
 #! /bin/bash
-#    Copyright (c) 2020, 2021 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#    Copyright (c) 2020 - 2022 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
 #
 #    This file is part of fakekmscon
 #
@@ -61,7 +61,14 @@ function DoLoginPrompt
     WAYLAND_DISPLAY=/run/vtty/$EmulatedTTY/waylandserver /opt/bin/wl-copy ""
   fi
 
-  env -i COLORTERM=truecolor XDG_SEAT=seat-vtty TERM=$TERM VTTY=$VTTY setsid /sbin/agetty -o '-p -- \u' --noclear --keep-baud --nonewline pts/$PTYNumber $TERM
+  #/usr/bin/vtty-login-program could be a symlink provided by another package, such as console-conf
+  VTTY_LOGIN_PROGRAM=$(command -v vtty-login-program)
+  if [[ ! -z $VTTY_LOGIN_PROGRAM ]]
+  then
+    env -i COLORTERM=truecolor XDG_SEAT=seat-vtty TERM=$TERM VTTY=$VTTY setsid /sbin/agetty -n --noclear -l $VTTY_LOGIN_PROGRAM pts/$PTYNumber $TERM
+  else
+    env -i COLORTERM=truecolor XDG_SEAT=seat-vtty TERM=$TERM VTTY=$VTTY setsid /sbin/agetty -o '-p -- \u' --noclear --keep-baud --nonewline pts/$PTYNumber $TERM
+  fi
 }
 
 trap 'DoLoginPrompt' 2

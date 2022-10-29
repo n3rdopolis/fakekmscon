@@ -1,5 +1,5 @@
 #! /bin/bash
-#    Copyright (c) 2020, 2021 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#    Copyright (c) 2020 - 2022 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
 #
 #    This file is part of fakekmscon
 #
@@ -146,13 +146,19 @@ then
   exit
 fi
 
+if [[ ! -e /dev/tty0 ]]
+then
+  echo "No TTYs Detected."
+  exit
+fi
+
 CurrentTTYNumber=$(fgconsole 2>/dev/null)
-CurrentTTY="tty$CurrentTTYNumber"
 if [[ $? != 0 ]]
 then
   echo "Could not get the current physical TTY"
+  exit
 fi
-
+CurrentTTY="tty$CurrentTTYNumber"
 
 AutoVTService=$(systemctl show autovt@${CurrentTTY}.service -p Id --value)
 GettyServiceState=$(systemctl is-active getty@${CurrentTTY}.service -p Id --value &>/dev/null; echo $?)
@@ -166,7 +172,7 @@ fi
 
 if [[ $GettyServiceState != 0 && $vTTYServiceState != 0 ]]
 then
-  echo "Neither the systemd getty handler nor the vtty handler for $CurrentTTY are active."
+  echo "Neither the systemd getty handler nor the vtty handler for $CurrentTTY are active, or $CurrentTTY is not a vTTY."
   exit 1
 fi
 
