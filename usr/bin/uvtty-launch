@@ -1,0 +1,122 @@
+#! /bin/bash
+#    Copyright (c) 2020 - 2022 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#
+#    This file is part of fakekmscon
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#Suspend cage in the FullscreenShell session, to launch another program
+
+DoSessionCheck=1
+
+#Detect if a display server is running. If there is not one (nothing controling the logind session), remove the inhibit file to allow cage/foot to start again.
+function SessionCheck
+{
+  sleep 5
+  busctl call org.freedesktop.login1 /org/freedesktop/login1/session/auto org.freedesktop.login1.Session TakeControl "b" false &> /dev/null
+  Result=$?
+
+  #Exit if the child process already quit, and the inhibt file was already removed
+  if [[ -e "$XDG_RUNTIME_DIR/uvtty/$UvTTYName/uvttysuspend" ]]
+  then
+    return
+  fi
+
+  #If the command succeeds, there is nothing holding control of the logind session
+  if [[ $Result == 0 ]]
+  then
+    echo "uvtty-launch: There are no processes controling the logind session within the timeout. It is likely a display server was not run. Will now uninhibit cage. Start with --no-session-check to disable."
+    rm "$XDG_RUNTIME_DIR/uvtty/$UvTTYName/uvttysuspend"
+  fi
+}
+
+#Use bash builtin sleep if availible
+if [[ -f /usr/lib/bash/sleep ]]
+then
+  enable -f /usr/lib/bash/sleep sleep
+  SLEEPCMD=\sleep
+else
+  SLEEPCMD=/bin/sleep
+fi
+
+if [[ $1 == "--no-session-check" ]]
+then
+  DoSessionCheck=0
+  shift
+fi
+
+if [[ -z $1 ]]
+then
+  echo "No arguments passed. Usage is $0 [--no-session-check] programname [--args]"
+  exit 1
+fi
+
+if ! command -v $1 &> /dev/null
+then
+  echo "$0: Command '$1' not found"
+  exit 1
+fi
+
+if [[ -z $UvTTYName ]]
+then
+  echo "UvTTYName variable not set. Not running under a UvTTY?"
+  exit 1
+fi
+
+if [[ ! -e "$XDG_RUNTIME_DIR/uvtty/$UvTTYName/socatproxy" ]]
+then
+  echo "$UvTTYName does not appear to be running"
+  exit 1
+fi
+
+if [[ ! -e "$XDG_RUNTIME_DIR/uvtty/$UvTTYName/cagepid" ]]
+then
+  echo "Cage does not appear to be running for $UvTTYName , perhaps cage is already suspended?"
+  exit 1
+fi
+
+CAGEPID=$(cat "$XDG_RUNTIME_DIR/uvtty/$UvTTYName/cagepid")
+
+if [[ ! -e /proc/$CAGEPID ]]
+then
+  echo "cage is not running."
+  exit
+fi
+
+touch "$XDG_RUNTIME_DIR/uvtty/$UvTTYName/uvttysuspend"
+if [[ $DoSessionCheck != 0 ]]
+then
+  SessionCheck &
+fi
+
+#Wait before ending cage, so key press of "enter" isn't held down when the command is run
+$SLEEPCMD .3
+
+kill -9 $CAGEPID
+
+#Wait for the cage process to end
+if [[ -e /proc/$CAGEPID ]]
+then
+  while [[ -e /proc/$CAGEPID ]]
+  do
+    $SLEEPCMD 1
+  done
+fi
+
+#launch the program
+"$@"
+CommandResult=$?
+
+rm "$XDG_RUNTIME_DIR/uvtty/$UvTTYName/uvttysuspend"
+exit $CommandResult
