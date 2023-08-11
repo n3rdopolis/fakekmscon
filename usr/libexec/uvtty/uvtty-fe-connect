@@ -1,5 +1,5 @@
 #! /bin/bash
-#    Copyright (c) 2020 - 2022 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#    Copyright (c) 2020 - 2023 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
 #
 #    This file is part of fakekmscon
 #
@@ -35,6 +35,14 @@ then
 else
   SLEEPCMD=/bin/sleep
 fi
+
+if [[ ${WAYLAND_DISPLAY:0:1} == "/" ]]
+then
+  WAYLANDDISPLAYPATH=$WAYLAND_DISPLAY
+else
+  WAYLANDDISPLAYPATH=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
+fi
+rm $WAYLANDDISPLAYPATH
 
 function PtyResizeEvent
 {

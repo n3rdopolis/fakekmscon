@@ -1,5 +1,5 @@
 #! /bin/bash
-#    Copyright (c) 2020 - 2022 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#    Copyright (c) 2020 - 2023 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
 #
 #    This file is part of fakekmscon
 #
@@ -25,7 +25,6 @@ then
   exit 1
 fi
 
-
 function ResetTTYMode
 {
     python3 -c "from array import array; \
@@ -50,10 +49,10 @@ then
   exit 1
 fi
 
-which vte &> /dev/null
+which foot &> /dev/null
 if [[ $? != 0 ]]
 then
-  echo "vte not installed"
+  echo "foot not installed"
   systemd-notify ERRNO=1
   exit 1
 fi
@@ -119,7 +118,7 @@ export WLR_NO_HARDWARE_CURSORS=1
 export WLR_LIBINPUT_NO_DEVICES=1
 export LIBGL_ALWAYS_SOFTWARE=1
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
-cage -m extend -d -s -- \
+cage -m last -d -s -- \
 foot --config=/etc/footkiosk.conf -- \
 /usr/libexec/vtty/vtty-fe-connect $EmulatedTTY &> /var/log/vtty/host_${EmulatedTTY}.log
 
