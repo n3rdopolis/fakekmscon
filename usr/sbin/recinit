@@ -1,0 +1,148 @@
+#! /bin/sh
+#    Copyright (c) 2020 - 2023 nerdopolis (or n3rdopolis) <bluescreen_avenger@verzion.net>
+#
+#    This file is part of fakekmscon
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+#This calls a display server in a way that can be called as init (like a recovery console)
+
+#If this is pid1 it starts /sbin/init upon exit, or the overrideinit= option if it is passed to the kernel
+
+UID=$(id -u)
+if [ $UID -ne 0 ]
+then
+  echo "Must be run as root"
+  exit 1
+fi
+
+#Ensure /run is writable
+touch /run/.rotest > /dev/null 2>&1
+if [ $? -ne 0 ]
+then
+  unmountrunfs=1
+  mount -t tmpfs none /run
+else
+  unmountrunfs=0
+  rm /run/.rotest
+fi
+
+if [ ! -e /dev/shm ]
+then
+  removedevshm=1
+  mkdir /run/shmfs
+  ln -s /run/shmfs /dev/shm
+else
+  removedevshm=0
+fi
+
+mkdir -p /run/user/0
+chmod 700 /run/user/0
+export XDG_RUNTIME_DIR=/run/user/0
+export XDG_SEAT=seat0
+export WLR_RENDERER_ALLOW_SOFTWARE=1
+export LIBSEAT_BACKEND=builtin
+export WLR_LIBINPUT_NO_DEVICES=1
+export WLR_NO_HARDWARE_CURSORS=1
+export WLR_RENDERER=pixman
+if [ ! -e /dev/tty0 ]
+then
+  export SEATD_VTBOUND=0
+fi
+
+#Supress warning when started from initramfs
+export LC_ALL=C.UTF-8
+
+#Load simpledrm if there is no /dev/dri/card0 device
+#SIMPLEDRM_FORCELOADAED=0
+#if [ ! -e /dev/dri/card0 ]
+#then
+#  SIMPLEDRM_FORCELOADAED=1
+#  modprobe simpledrm
+#fi
+modprobe evdev
+
+#populate fake udev device info if udev not running
+udevadm control --ping -t 1 > /dev/null 2>&1
+udev_result=$?
+
+#Get Plymouth status
+plymouth --ping
+plymouth_result=$?
+
+if [ $udev_result -ne 0 ]
+then
+  /lib/systemd/systemd-udevd --daemon --resolve-names=never
+
+  udevadm trigger --type=subsystems --action=add
+  udevadm trigger --type=devices --action=add
+  udevadm settle
+fi
+
+#Hide plymouth if it's running
+if [ $plymouth_result -eq 0 ]
+then
+  plymouth hide-splash
+fi
+
+#Prefer bash (if started as init). In initramfs, only sh tends to be usable, use sh as a fallback
+if command -v bash > /dev/null 2>/dev/null
+then
+  SHELLCOMMAND="bash"
+else
+  SHELLCOMMAND="sh"
+fi
+
+cage -d -s -m last -- \
+foot --config=/etc/footkiosk.conf --override=scrollback.lines=10000  -- \
+sh -c "$SHELLCOMMAND -l; kill -9 \$(pidof cage)" > /dev/null 2>&1
+
+if [ $udev_result -ne 0 ]
+then
+  udevadm control --exit
+fi
+
+#Unload simpledrm if it was loaded manually, so udev can load it in the right order later
+#if [ $SIMPLEDRM_FORCELOADAED -eq 1 ]
+#then
+#  rmmod simpledrm
+#fi
+
+if [ $unmountrunfs -eq 1 ]
+then
+  umount -lf /run
+fi
+
+if [ $removedevshm -eq 1 ]
+then
+  unlink /dev/shm
+fi
+
+#Reshow plymoth
+if [ $plymouth_result -eq 0 ]
+then
+  plymouth show-splash
+fi
+
+#If this is pid 1 start init upon exit
+if [ $$ -eq 1 ]
+then
+  if [ ! -z $overrideinit ]
+  then
+    exec $overrideinit
+  else
+    exec /sbin/init
+  fi
+fi

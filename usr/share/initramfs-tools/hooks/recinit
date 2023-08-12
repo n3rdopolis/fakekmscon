@@ -1,0 +1,79 @@
+#!/bin/sh -e
+
+PREREQS=""
+
+prereqs() { echo "$PREREQS"; }
+
+case "$1" in
+    prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+. /usr/bin/wlruntime_vars
+manual_add_modules evdev
+
+if [ -e /usr/bin/cage ]
+then
+  copy_exec /usr/bin/cage /usr/bin/
+fi
+
+if [ -e /usr/bin/foot ]
+then
+  copy_exec /usr/bin/foot /usr/bin/
+fi
+
+if [ -e /usr/sbin/recinit ]
+then
+  copy_file script /usr/sbin/recinit
+fi
+
+mkdir -p "${DESTDIR}/lib/udev/rules.d"
+cp /lib/udev/rules.d/60-input-id.rules "${DESTDIR}/lib/udev/rules.d"
+
+if [ -e /usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf ]
+then
+  mkdir -p "${DESTDIR}/usr/share/fonts/truetype/dejavu"
+  cp -a /usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf "${DESTDIR}/usr/share/fonts/truetype/dejavu"
+fi
+
+if [ -e /usr/share/icons/oxy-white/cursors/ ]
+then
+  mkdir -p "${DESTDIR}/usr/share/icons/default/cursors/"
+  cp -a /usr/share/icons/oxy-white/cursors/* "${DESTDIR}/usr/share/icons/default/cursors/"
+fi
+
+if [ -e /usr/lib/locale/[cC].[uU][tT][fF]*8/ ]
+then
+  CUTF8DIR=$(basename $(ls -d /usr/lib/locale/[cC].[uU][tT][fF]*8))
+  mkdir -p "${DESTDIR}/usr/lib/locale/$CUTF8DIR/"
+  cp -a "/usr/lib/locale/$CUTF8DIR/"* "${DESTDIR}/usr/lib/locale/$CUTF8DIR/"
+fi
+
+if [ -e /usr/share/libinput ]
+then
+  mkdir -p "${DESTDIR}/usr/share/libinput/"
+  cp -a /usr/share/libinput/* "${DESTDIR}/usr/share/libinput/"
+fi
+
+if [ -e /usr/share/X11/xkb ]
+then
+  mkdir -p "${DESTDIR}/usr/share/X11/xkb"
+  cp -a /usr/share/X11/xkb/* "${DESTDIR}/usr/share/X11/xkb"
+fi
+
+if [ -e /usr/share/X11/locale ]
+then
+  mkdir -p "${DESTDIR}/usr/share/X11/locale"
+  cp -a /usr/share/X11/locale/* "${DESTDIR}/usr/share/X11/locale"
+fi
+
+if [ -e /etc/footkiosk.conf ]
+then
+  mkdir -p "${DESTDIR}/etc"
+  cp /etc/footkiosk.conf "${DESTDIR}/etc"
+fi
+
+echo ". /scripts/override/panic" >> "${DESTDIR}/scripts/functions"
