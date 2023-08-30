@@ -1,53 +1,46 @@
-!!!!THIS IS AN EXPERMENT!!!!!!
-!!!DO NOT USE IN PRODUCTION!!!
+This contains multiple solutions to replacing what goes missing without VTs
 
 
-vTTYs are built to replace the autovt@.service with vtty-frontend@.service
-vtty-frontend@.service assumes seat0, and the parameter is the vt name (for example: tty1)
+vTTY:
+/usr/lib/systemd/system/vtty-frontend-novt@.service and /usr/lib/systemd/system/vtty-backend-novt@.service take a seat as the parameter parameter. Only seat0 starts by default.
+(Unlike vtty-frontend@.service and vtty-backend@.service can replace autovt@.service, they take a tty as the parameter, for systems that still have VTs, it can give a nice looking console, but users need to be in sudoers to be able to run commands like `startx` )
 
-  vtty-frontend@.service depends on vtty-backend@.service to where vtty-frontend@{INSTANCE}.service has systemd start vtty-backend@{INSTANCE}.service
-  vtty-backend@.service calls an instance of socat that launches an instance of getty in a PTY. It runs as root. Communication to this getty is done through the socat client through a socket file that the socat server creates. The socat server allows the 'vtty' system user to communicate to this socket
+The backend process looks for a /usr/bin/vtty-login-program symlink, where for example, it can be replaced with console-conf https://ubuntu.com/core/docs/system-user or something similar.
 
-  vtty-frontend@.service runs as the 'vtty' user. It runs a display server, `cage` which starts the terminal emulator, `foot`, which then calls a small script that starts the socat client. This design gets around needing to call the cage display server, and foot terminal emulator as root.
-
-  The small script traps SIGWINCH events, (terminal resize signal) to the backend though another FIFO. The backend listens on the FIFO for these events. On an event, the PTY size of foot is sent though the FIFO, and the backend script sets the PTY size of the backend one that socat starts. By doing so, text mode programs, like nmtui appear correctly.
-  
-  The vtty-toggle command allows fallback to a VT console. It requires to be run as root.
-
-  User session's XDG_SEAT is seat to seat-vtty. seat-vtty is created by making a device that exists on all systems (/dev/tty the alias device for the current terminal, it exists even when CONFIG_VT=n) have the master-of-seat tag, and then assigns it to seat-vtty so logind creates the seat-vtty seat. 
-  
-  The reasons for this are
-    Only one session can be active on a session at the a time, but here, there are two, the session created by Cage, and the session running under socat. If logind has the session that runs under socat as active, instead of the session for cage, cage becomes inactive.
-  
-    Another reason is that there can only be one session on a TTY. And on seat0 when VTs are compiled in the kernel, for a PAM session to be complete, it needs a TTY
-  
-  Creating a "fake" seat, and starting sessions gets around these issues. Non-seat0 seats don't need VTs, so seat-vtty fits. 
-
-  This allows logins to have full PAM sessions to where actions that require polkit don't require the user to authenticate twice, the same as a Desktop session, or a session in a normal VT. (such as actions from nmtui, etc.)
-
-vtty-frontend-novt@.service works very similar, but the parameter is the seat. Because systemd only accepts one parameter, there can only be one instance on a seat. This is for seats without VTs. (as in non-seat0 seats, or where the kernel is compiled with CONFIG_VT=n)
+As systemd is only able to start one instance of vtty-frontend-novt@.service without help (as only seat0 is able to be hardcoded), and only one instance, as it only supports one parameter, this is only fit for servers that are headless 99% of the time except for initial config, or emergency view of the console with VM manager, or KVM manager.
 
 
-  The way that the services work is very similar to vTTYs, except that the instance name is the seat name instead of a VT name.
-  This is suited for more minimal installs that are mostly headless without VTs. 
-  For multiple instances, its better if a proper display manager or login manager is used.
-
-  if display-manager.service is disabled, and vtty-frontend-novt@seat0.service is enabled, VT-less systems will start up to a text mode login prompt.
+Minimal Desktops are much better off using a minimal login manager, something similar to this https://www.youtube.com/watch?v=grKc8M83q4s .
 
 
-UvTTYs are built similar to vTTYs, only they run as a user.
-  Instead of running as root, to launch a getty, the backend runs as the user, and launches the user's shell.
-
-  They can be registered as a selectable wayland-session because cage is a Wayland display server.
-
-  The client/server design for this is for resillency instead of separation of permissions. 
-  
-  The main reason for this is for the uvtty-launch command. uvtty-launch quits and supresses the frontend from starting cage, so that another display server can take over. such as running `uvtty-launch weston`. 
-  
-  The shell continues to run in the socat 'server'. Once Weston quits, uvtty-launch allows cage to start back up again.
-  This does not require to be run as root
+UvTTY:
+/usr/share/wayland-sessions/fullscreenterminal.desktop is a "wayland session" which is just the user's $SHELL running under the foot terminal running under the cage display server, it is just a full screen terminal emulator, and a very minimal session
 
 
-Problems:
 
-  - cage/foot not actually packaged by Debian yet.
+UvTTYs and vTTYs here are very similar. They are both full screen foot terminals 
+vTTYs run as a system user. UvTTYs run as the user, and are started by the display manager, as they register under /usr/share/wayland-sessions. 
+They both utilize socat client/servers but to solve different issues.
+
+In vTTYs /etc/footkiosk.conf is passed to be used as foot's config file. It configures the foot terminal to disable features that are not suitable for it running as a different user, for example URL parsing.
+
+In vTTYs a fake seat is used `seat-vtty` and the text mode user sessions are started on these fake seats. This is a logind workaround, It allows full PAM functionality to work, so that privleges work in tools that don't have to run as root, such as nmtui, or udisks.
+Otherwise, the session would have to start on the same seat, which would cause issues when the session starts and becomes active. The session for the host display server needs to be active for the display server to work.
+
+In vTTYs the getty runs under a socat "server" that runs as root, and creates a pty terminal for these commands. It grants the vtty user access to it. The socat client runs under foot, which runs under cage, all of which run as the pty user. This prevents the need for a display server and a terminal emulator to run as root.
+
+In UvTTYs, there is a socat client/server but they both run as the same user. This is so that the cage display server can be stopped without stopping the user session.
+This is for uvtty-launch to work. `uvtty-launch startx` https://www.youtube.com/watch?v=qSJ3Fc77tRI could be a common command that is run. Or weston. Display server developers on systems without VTs would likely enjoy this feature.
+
+
+
+/usr/sbin/recinit
+recinit can be run as init=/sbin/recinit instead of init=/bin/bash
+recinit can also add around 12MB of files (3MB compressed to the initrd) and it works to show the (initramfs) prompt when the early boot process fails
+
+
+Requirements:
+    cage
+    foot
+    wl-clipboard    (for vTTYs to be able to clear the clipboard upon the next prompt for user log in)
+    socat
