@@ -23,6 +23,10 @@ cp -r "$SCRIPTFOLDERPATH"/usr/* /usr
 cp -r "$SCRIPTFOLDERPATH"/etc/* /etc
 systemctl enable vtty-frontend@.service
 
+#Enable the recinit services for systemd's recovery shells
+systemctl enable recinit-rescue.service
+systemctl enable recinit-emergency.service
+
 chmod +x /usr/libexec/vtty/vtty-backend
 chmod +x /usr/libexec/vtty/vtty-frontend
 chmod +x /usr/libexec/vtty/vtty-be-login
