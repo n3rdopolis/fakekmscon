@@ -48,18 +48,30 @@ else
   removedevshm=0
 fi
 
+OLD_PATH=$PATH
 mkdir -p /run/user/0
 chmod 700 /run/user/0
 export XDG_RUNTIME_DIR=/run/user/0
 export XDG_SEAT=seat0
 export WLR_RENDERER_ALLOW_SOFTWARE=1
 export LIBSEAT_BACKEND=builtin
+export PATH=/opt/bin:$PATH
 export WLR_LIBINPUT_NO_DEVICES=1
 export WLR_NO_HARDWARE_CURSORS=1
 export WLR_RENDERER=pixman
 if [ ! -e /dev/tty0 ]
 then
   export SEATD_VTBOUND=0
+fi
+
+#Make init command in /run/recinit/init file, 
+#/run/recinit/init will get executed when recinit ends
+#Users can replace it if they want recinit to start a different init command after working in recinit
+if [ $$ -eq 1 ]
+then
+  mkdir /run/recinit/
+  echo "exec /sbin/init" > /run/recinit/init
+  chmod +x /run/recinit/init
 fi
 
 #Supress warning when started from initramfs
@@ -156,10 +168,20 @@ fi
 #If this is pid 1 start init upon exit
 if [ $$ -eq 1 ]
 then
+  export PATH=$OLD_PATH
+  unset LC_ALL
+  unset XDG_RUNTIME_DIR
+  unset XDG_SEAT
+  unset WLR_RENDERER_ALLOW_SOFTWARE
+  unset LIBSEAT_BACKEND
+  unset WLR_LIBINPUT_NO_DEVICES
+  unset WLR_NO_HARDWARE_CURSORS
+  unset WLR_RENDERER
+  unset SEATD_VTBOUND
   if [ ! -z $overrideinit ]
   then
     exec $overrideinit
   else
-    exec /sbin/init
+    . /run/recinit/init
   fi
 fi
