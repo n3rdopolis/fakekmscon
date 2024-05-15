@@ -58,7 +58,8 @@ function DoLoginPrompt
   #Clear the clipboard
   if [[ -e /run/vtty/$EmulatedTTY/waylandserver ]]
   then
-    WAYLAND_DISPLAY=/run/vtty/$EmulatedTTY/waylandserver wl-copy ""
+    WAYLAND_DISPLAY=/run/vtty/$EmulatedTTY/waylandserver wl-copy -c
+    WAYLAND_DISPLAY=/run/vtty/$EmulatedTTY/waylandserver wl-copy -pc
   fi
 
   #/usr/bin/vtty-login-program could be a symlink provided by another package, such as console-conf
