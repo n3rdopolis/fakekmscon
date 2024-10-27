@@ -35,7 +35,7 @@ chmod +x /usr/bin/vtty-toggle
 
 chmod +x /usr/libexec/uvtty/uvtty-backend
 chmod +x /usr/libexec/uvtty/uvtty-frontend
-chmod +x /usr/libexec/uvtty/uvtty-be-login
+chmod +x /usr/libexec/uvtty/uvtty-be-run
 chmod +x /usr/libexec/uvtty/uvtty-fe-connect
 chmod +x /usr/libexec/uvtty/uvtty-session
 chmod +x /usr/bin/uvtty-launch
