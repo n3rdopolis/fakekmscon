@@ -34,8 +34,8 @@ This is for uvtty-launch to work. `uvtty-launch startx` https://www.youtube.com/
 
 
 
-/usr/sbin/recinit
-recinit can be run as init=/sbin/recinit instead of init=/bin/bash
+/usr/bin/recinit
+recinit can be run as init=/bin/recinit instead of init=/bin/bash
 recinit can also add around 12MB of files (3MB compressed to the initrd) and it works to show the (initramfs) prompt when the early boot process fails
 
 recinit starts /bin/init when the shell exits, it can be changed at runtime by editing /run/recinit/init
