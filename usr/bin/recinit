@@ -127,7 +127,7 @@ else
 fi
 
 #If the first argument is --, the rest of the arguments are a command that will run within the terminal emulator
-if [ $1 = "--" ]
+if [ $# -gt 0 ] && [ $1 = "--" ]
 then
   shift
   RUNCOMMAND="$@"
