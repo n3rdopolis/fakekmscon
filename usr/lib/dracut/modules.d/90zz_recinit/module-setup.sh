@@ -105,4 +105,8 @@ install() {
     then
         inst_simple /etc/footkiosk.conf
     fi
+
+    inst_simple "$moddir/recinit-dracut-emergency" /usr/bin/recinit-dracut-emergency
+    inst_simple "$moddir/dracut-lib-recinit-shell.sh" "/lib/dracut-lib-recinit-shell.sh"
+    echo ". /lib/dracut-lib-recinit-shell.sh" >> $initdir/lib/dracut-lib.sh
 }
