@@ -21,6 +21,8 @@
 
 #If this is pid1 it starts /sbin/init upon exit, or the overrideinit= option if it is passed to the kernel
 
+#If the first argument is "--", then further arguments are handled as a command to execute (as in "recinit -- command --argument1 --argument2")
+
 USER_UID=$(id -u)
 if [ $USER_UID -ne 0 ]
 then
@@ -115,12 +117,27 @@ then
   plymouth hide-splash
 fi
 
-#Prefer bash (if started as init). In initramfs, only sh tends to be usable, use sh as a fallback
+#Prefer bash, use sh as a fallback
 if command -v bash > /dev/null 2>/dev/null
 then
   RUNCOMMAND="bash -l"
 else
   RUNCOMMAND="sh -l"
+fi
+
+#If the first argument is --, the rest of the arguments are a command that will run within the terminal emulator
+if [ $1 = "--" ]
+then
+  shift
+  RUNCOMMAND="$@"
+else
+  #Prefer bash, use sh as a fallback
+  if command -v bash > /dev/null 2>/dev/null
+  then
+    RUNCOMMAND="bash -l"
+  else
+    RUNCOMMAND="sh -l"
+  fi
 fi
 
 if [ "$RECINIT_SYSTEMD" = "1" ]
