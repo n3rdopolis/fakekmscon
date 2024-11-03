@@ -77,6 +77,7 @@ then
 fi
 
 #Supress warning when started from initramfs
+LC_ALL_REAL=$LC_ALL
 export LC_ALL=C.UTF-8
 
 #Load simpledrm if there is no /dev/dri/card0 device
@@ -153,7 +154,7 @@ fi
 
 cage -d -s -m last -- \
 foot --config=/etc/footkiosk.conf --override=scrollback.lines=10000  -- \
-sh -c "$RUNCOMMAND; kill -9 \$(pidof cage)" > /dev/null 2>&1
+sh -c "LC_ALL=$LC_ALL_REAL $RUNCOMMAND; kill -9 \$(pidof cage)" > /dev/null 2>&1
 
 if [ $udev_result -ne 0 ]
 then
