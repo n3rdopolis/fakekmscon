@@ -40,6 +40,6 @@ chmod +x /usr/libexec/uvtty/uvtty-fe-connect
 chmod +x /usr/libexec/uvtty/uvtty-session
 chmod +x /usr/bin/uvtty-launch
 
+touch /usr
 
 #ln -s /usr/lib/systemd/system/vtty-frontend@.service /etc/systemd/system/autovt@.service
-
