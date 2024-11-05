@@ -19,8 +19,30 @@
 SCRIPTFILEPATH=$(readlink -f "$0")
 SCRIPTFOLDERPATH=$(dirname "$SCRIPTFILEPATH")
 
-cp -r "$SCRIPTFOLDERPATH"/usr/* /usr
-cp -r "$SCRIPTFOLDERPATH"/etc/* /etc
+mkdir -p /usr/bin                               --context=system_u:object_r:bin_t:s0
+mkdir -p /usr/lib/dracut/modules.d              --context=system_u:object_r:bin_t:s0
+mkdir -p /usr/lib/systemd/system                --context=system_u:object_r:systemd_unit_file_t:s0
+mkdir -p /usr/lib/sysusers.d                    --context=system_u:object_r:lib_t:s0
+mkdir -p /usr/lib/udev/rules.d                  --context=system_u:object_r:lib_t:s0
+mkdir -p /usr/libexec/uvtty                     --context=system_u:object_r:shell_exec_t:s0
+mkdir -p /usr/libexec/vtty                      --context=system_u:object_r:shell_exec_t:s0
+mkdir -p /usr/share/bash-completion/completions --context=system_u:object_r:usr_t:s0
+mkdir -p /usr/share/initramfs-tools             --context=system_u:object_r:bin_t:s0
+mkdir -p /usr/share/wayland-sessions            --context=system_u:object_r:usr_t:s0
+mkdir -p /etc                                   --context=system_u:object_r:etc_t:s0
+
+cp -r "$SCRIPTFOLDERPATH"/usr/bin/*                                /usr/bin                               --context=system_u:object_r:bin_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/lib/dracut/modules.d/*               /usr/lib/dracut/modules.d              --context=system_u:object_r:bin_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/lib/systemd/system/*                 /usr/lib/systemd/system                --context=system_u:object_r:systemd_unit_file_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/lib/sysusers.d/*                     /usr/lib/sysusers.d                    --context=system_u:object_r:lib_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/lib/udev/rules.d/*                   /usr/lib/udev/rules.d                  --context=system_u:object_r:lib_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/libexec/uvtty/*                      /usr/libexec/uvtty                     --context=system_u:object_r:shell_exec_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/libexec/vtty/*                       /usr/libexec/vtty                      --context=system_u:object_r:shell_exec_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/share/bash-completion/completions/*  /usr/share/bash-completion/completions --context=system_u:object_r:usr_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/share/initramfs-tools/*              /usr/share/initramfs-tools             --context=system_u:object_r:bin_t:s0
+cp -r "$SCRIPTFOLDERPATH"/usr/share/wayland-sessions/*             /usr/share/wayland-sessions            --context=system_u:object_r:usr_t:s0
+cp -r "$SCRIPTFOLDERPATH"/etc/*                                    /etc                                   --context=system_u:object_r:etc_t:s0
+
 systemctl enable vtty-frontend@.service
 
 #Enable the recinit services for systemd's recovery shells
