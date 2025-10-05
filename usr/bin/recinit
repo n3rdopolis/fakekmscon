@@ -33,6 +33,7 @@ GetFirstSeatCard()
 
   ls -r /dev/dri/card* > /run/recinit/devices
 
+  SeatCardFound=0
   SelectCard=""
   while read -r ReadCard
   do
@@ -43,14 +44,21 @@ GetFirstSeatCard()
       ReadCardSeat=seat0
     fi
 
-    if [ $CardIsVGABoot -gt 0 ]
+    if [ $ReadCardSeat = $MatchSeat ]
     then
+      SeatCardFound=1
       SelectCard=$ReadCard
-      break
+      if [ $CardIsVGABoot -gt 0 ]
+      then
+        break
+      fi
     fi
   done < /run/recinit/devices
   rm /run/recinit/devices
-  echo $SelectCard
+  if [ $SeatCardFound -ne 0 ]
+  then
+    echo $SelectCard
+  fi
 }
 
 USER_UID=$(id -u)
@@ -88,7 +96,6 @@ export XDG_RUNTIME_DIR=/run/user/0
 export XDG_SEAT=seat0
 export WLR_RENDERER_ALLOW_SOFTWARE=1
 export LIBSEAT_BACKEND=noop
-export PATH=/opt/bin:$PATH
 export WLR_LIBINPUT_NO_DEVICES=1
 export WLR_NO_HARDWARE_CURSORS=1
 export WLR_RENDERER=pixman

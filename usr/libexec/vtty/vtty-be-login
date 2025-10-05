@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#This handles the login prompt and handling of /etc/issue
+#This handles the login prompt.
 
 function DoLoginPrompt
 {
@@ -28,13 +28,13 @@ function DoLoginPrompt
   unset INVOCATION_ID
   unset JOURNAL_STREAM
   export VTTY=$EmulatedTTY
-  echo "v${VTTY} backed by $PTYPath" > /dev/pts/$PTYNumber
+  echo "${VTTY}" > /dev/pts/$PTYNumber
 
   #Clear the clipboard and the primary selection
   if [[ -e /run/vtty/$EmulatedTTY/waylandserver ]]
   then
-    WAYLAND_DISPLAY=/run/vtty/$EmulatedTTY/waylandserver wl-copy -c
-    WAYLAND_DISPLAY=/run/vtty/$EmulatedTTY/waylandserver wl-copy -pc
+    WAYLAND_DISPLAY=/run/vtty/$EmulatedTTY/waylandserver wl-copy -c &> /dev/null
+    WAYLAND_DISPLAY=/run/vtty/$EmulatedTTY/waylandserver wl-copy -pc & /dev/null
   fi
 
   #/usr/bin/vtty-login-program could be a symlink provided by another package, such as console-conf
