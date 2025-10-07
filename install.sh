@@ -43,24 +43,11 @@ cp -r "$SCRIPTFOLDERPATH"/usr/share/initramfs-tools/*              /usr/share/in
 cp -r "$SCRIPTFOLDERPATH"/usr/share/wayland-sessions/*             /usr/share/wayland-sessions            --context=system_u:object_r:usr_t:s0
 cp -r "$SCRIPTFOLDERPATH"/etc/*                                    /etc                                   --context=system_u:object_r:etc_t:s0
 
-systemctl enable vtty-frontend@.service
 
 #Enable the recinit services for systemd's recovery shells
 systemctl enable recinit-rescue.service
 systemctl enable recinit-emergency.service
 
-chmod +x /usr/libexec/vtty/vtty-backend
-chmod +x /usr/libexec/vtty/vtty-frontend
-chmod +x /usr/libexec/vtty/vtty-be-login
-chmod +x /usr/libexec/vtty/vtty-fe-connect
-chmod +x /usr/bin/vtty-toggle
-
-chmod +x /usr/libexec/uvtty/uvtty-backend
-chmod +x /usr/libexec/uvtty/uvtty-frontend
-chmod +x /usr/libexec/uvtty/uvtty-be-run
-chmod +x /usr/libexec/uvtty/uvtty-fe-connect
-chmod +x /usr/libexec/uvtty/uvtty-session
-chmod +x /usr/bin/uvtty-launch
 
 touch /usr
 
