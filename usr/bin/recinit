@@ -88,7 +88,6 @@ else
   removedevshm=0
 fi
 
-OLD_PATH=$PATH
 mkdir /run/recinit/
 mkdir -p /run/user/0
 chmod 700 /run/user/0
@@ -228,7 +227,6 @@ fi
 #If this is pid 1 start init upon exit
 if [ $$ -eq 1 ]
 then
-  export PATH=$OLD_PATH
   unset LC_ALL
   unset XDG_RUNTIME_DIR
   unset XDG_SEAT
