@@ -121,10 +121,10 @@ then
   fi
 fi
 
-if [ -e /etc/footkiosk.conf ]
+if [ -e @sysconfdir@/footkiosk.conf ]
 then
-  mkdir -p "${DESTDIR}/etc"
-  cp -Z /etc/footkiosk.conf "${DESTDIR}/etc"
+  mkdir -p "${DESTDIR}/@sysconfdir@"
+  cp -Z @sysconfdir@/footkiosk.conf "${DESTDIR}/@sysconfdir@"
 fi
 
 echo ". /scripts/override/panic" >> "${DESTDIR}/scripts/functions"
