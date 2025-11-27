@@ -1,29 +1,59 @@
 project('fakekmscon', [],
   version: '0.0.0',
   license: 'GPLv2+',
-  default_options: [],
+  default_options: ['prefix=/usr'],
 )
 
+# Just a crude check, neither necessary nor sufficient to ensure
+# a good install
+if get_option('prefix') != '/usr'
+  warning(
+    '\n    fakekmscon was designed to be installed to a prefix of /usr. Installing to',
+    '\n    other prefixes may have undesired effects such as files not being present',
+    '\n    where fakekmscon or other services look for them.'
+  )
+endif
+
 conf_data = configuration_data()
-conf_data.set('libexecdir', get_option('libexecdir'))
+conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
+conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
+conf_data.set('sysconfdir', get_option('sysconfdir'))
+
+bin_files = [
+  'recinit',
+  'uvtty-launch'
+]
+
+foreach bin_file : bin_files
+  configure_file(
+    input: 'usr/bin' / bin_file + '.in',
+    output: bin_file,
+    configuration: conf_data,
+    install_dir: get_option('prefix') / get_option('bindir')
+  )
+endforeach
 
 install_data(
   [
-    'usr/bin/recinit',
-    'usr/bin/uvtty-launch',
     'usr/bin/vtty-toggle',
   ],
   install_dir: get_option('prefix') / get_option('bindir')
 )
 
-install_data(
-  [
-    'usr/lib/dracut/modules.d/99zz_recinit/dracut-lib-recinit-shell.sh',
-    'usr/lib/dracut/modules.d/99zz_recinit/module-setup.sh',
-    'usr/lib/dracut/modules.d/99zz_recinit/recinit-dracut-emergency',
-  ],
-  install_dir: get_option('prefix') / get_option('libdir') / 'dracut/modules.d/99zz_recinit'
-)
+dracut_files = [
+  'dracut-lib-recinit-shell.sh',
+  'module-setup.sh',
+  'recinit-dracut-emergency',
+]
+
+foreach dracut_file : dracut_files
+  configure_file(
+    input: 'usr/lib/dracut/modules.d/99zz_recinit' / dracut_file + '.in',
+    output: dracut_file,
+    configuration: conf_data,
+    install_dir: get_option('prefix') / get_option('libdir') / 'dracut/modules.d/99zz_recinit'
+  )
+endforeach
 
 install_data(
   [
@@ -67,34 +97,40 @@ install_data(
 install_data(
   [
     'usr/libexec/uvtty/uvtty-be-run',
-    'usr/libexec/uvtty/uvtty-fe-connect',
   ],
   install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty'
 )
 
-install_data(
-  [
-    'usr/libexec/vtty/vtty-be-login',
-    'usr/libexec/vtty/vtty-fe-connect',
-    'usr/libexec/vtty/vtty-seatmanager',
-  ],
-  install_dir: get_option('prefix') / get_option('libexecdir') / 'vtty'
-)
-
-libexec_files = [
-  'uvtty/uvtty-frontend',
-  'uvtty/uvtty-session',
-  'uvtty/uvtty-backend',
-  'vtty/vtty-frontend',
-  'vtty/vtty-backend',
+uvtty_files = [
+  'uvtty-frontend',
+  'uvtty-session',
+  'uvtty-backend',
+  'uvtty-fe-connect',
 ]
 
-foreach libexec_file : libexec_files
+foreach uvtty_file : uvtty_files
   configure_file(
-    input: 'usr/libexec' / libexec_file + '.in',
-    output: libexec_file,
+    input: 'usr/libexec/uvtty' / uvtty_file + '.in',
+    output: uvtty_file,
     configuration: conf_data,
-    install_dir: get_option('libexecdir') / libexec_file
+    install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty'
+  )
+endforeach
+
+vtty_files = [
+  'vtty-frontend',
+  'vtty-backend',
+  'vtty-be-login',
+  'vtty-fe-connect',
+  'vtty-seatmanager',
+]
+
+foreach vtty_file : vtty_files
+  configure_file(
+    input: 'usr/libexec/vtty' / vtty_file + '.in',
+    output: vtty_file,
+    configuration: conf_data,
+    install_dir: get_option('prefix') / get_option('libexecdir') / 'vtty'
   )
 endforeach
 
@@ -105,17 +141,17 @@ install_data(
   install_dir: get_option('prefix') / get_option('datadir') / 'bash-completion/completions'
 )
 
-install_data(
-  [
-    'usr/share/initramfs-tools/hooks/recinit',
-  ],
+configure_file(
+  input: 'usr/share/initramfs-tools/hooks/recinit-session.in',
+  output: 'recinit-session',
+  configuration: conf_data,
   install_dir: get_option('prefix') / get_option('datadir') / 'initramfs-tools/hooks'
 )
 
-install_data(
-  [
-    'usr/share/initramfs-tools/scripts/override/panic',
-  ],
+configure_file(
+  input: 'usr/share/initramfs-tools/scripts/override/panic.in',
+  output: 'panic',
+  configuration: conf_data,
   install_dir: get_option('prefix') / get_option('datadir') / 'initramfs-tools/scripts/override'
 )
 
