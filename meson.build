@@ -4,6 +4,9 @@ project('fakekmscon', [],
   default_options: [],
 )
 
+conf_data = configuration_data()
+conf_data.set('libexecdir', get_option('libexecdir'))
+
 install_data(
   [
     'usr/bin/recinit',
@@ -30,16 +33,22 @@ install_data(
   install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
 )
 
-install_data(
-  [
-    'usr/lib/systemd/system/vtty-backend-seat@.service',
-    'usr/lib/systemd/system/vtty-backend@.service',
-    'usr/lib/systemd/system/vtty-frontend-seat@.service',
-    'usr/lib/systemd/system/vtty-frontend@.service',
-    'usr/lib/systemd/system/vtty-seatmanager.service',
-  ],
-  install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
-)
+service_files = [
+  'vtty-frontend@.service', 
+  'vtty-backend-seat@.service', 
+  'vtty-backend@.service', 
+  'vtty-frontend-seat@.service',
+  'vtty-seatmanager.service',
+]
+
+foreach service_file : service_files
+  configure_file(
+    input: 'usr/lib/systemd/system' / service_file + '.in',
+    output: service_file,
+    configuration: conf_data,
+    install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
+  )
+endforeach
 
 install_data(
   [
@@ -57,25 +66,37 @@ install_data(
 
 install_data(
   [
-    'usr/libexec/uvtty/uvtty-backend',
     'usr/libexec/uvtty/uvtty-be-run',
     'usr/libexec/uvtty/uvtty-fe-connect',
-    'usr/libexec/uvtty/uvtty-frontend',
-    'usr/libexec/uvtty/uvtty-session',
   ],
   install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty'
 )
 
 install_data(
   [
-    'usr/libexec/vtty/vtty-backend',
     'usr/libexec/vtty/vtty-be-login',
     'usr/libexec/vtty/vtty-fe-connect',
-    'usr/libexec/vtty/vtty-frontend',
     'usr/libexec/vtty/vtty-seatmanager',
   ],
   install_dir: get_option('prefix') / get_option('libexecdir') / 'vtty'
 )
+
+libexec_files = [
+  'uvtty/uvtty-frontend',
+  'uvtty/uvtty-session',
+  'uvtty/uvtty-backend',
+  'vtty/vtty-frontend',
+  'vtty/vtty-backend',
+]
+
+foreach libexec_file : libexec_files
+  configure_file(
+    input: 'usr/libexec' / libexec_file + '.in',
+    output: libexec_file,
+    configuration: conf_data,
+    install_dir: get_option('libexecdir') / libexec_file
+  )
+endforeach
 
 install_data(
   [
@@ -98,11 +119,11 @@ install_data(
   install_dir: get_option('prefix') / get_option('datadir') / 'initramfs-tools/scripts/override'
 )
 
-install_data(
-  [
-    'usr/share/wayland-sessions/fullscreenterminal.desktop',
-  ],
-  install_dir: get_option('prefix') / get_option('datadir') / 'wayland-sessions'
+configure_file(
+  input: 'usr/share/wayland-sessions/fullscreenterminal.desktop.in',
+  output: 'usr/share/wayland-sessions/fullscreenterminal.desktop',
+  configuration: conf_data,
+  install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
 )
 
 install_data(

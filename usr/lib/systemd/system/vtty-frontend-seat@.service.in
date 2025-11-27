@@ -21,7 +21,7 @@ Before=rescue.service
 Environment=XDG_SEAT=%i
 PAMName=vtty
 
-ExecStart=/usr/libexec/vtty/vtty-frontend %i
+ExecStart=@libexecdir@/vtty/vtty-frontend %i
 
 Restart=on-failure
 RestartSec=0

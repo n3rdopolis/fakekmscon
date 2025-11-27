@@ -2,4 +2,4 @@
 Type=Application
 Name=Fullscreen Terminal
 Comment=A fullscreen terminal that looks like a VT under Cage
-Exec=/usr/libexec/uvtty/uvtty-session
+Exec=@libexecdir@/uvtty/uvtty-session
