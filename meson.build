@@ -35,7 +35,8 @@ endif
 
 bin_files = [
   'recinit',
-  'uvtty-launch'
+  'uvtty-launch',
+  'vtty-toggle',
 ]
 
 foreach bin_file : bin_files
@@ -46,13 +47,6 @@ foreach bin_file : bin_files
     install_dir: get_option('prefix') / get_option('bindir')
   )
 endforeach
-
-install_data(
-  [
-    'usr/bin/vtty-toggle',
-  ],
-  install_dir: get_option('prefix') / get_option('bindir')
-)
 
 dracut_files = [
   'dracut-lib-recinit-shell.sh',
@@ -109,18 +103,12 @@ install_data(
   install_dir: udev_dir
 )
 
-install_data(
-  [
-    'usr/libexec/uvtty/uvtty-be-run',
-  ],
-  install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty'
-)
-
 uvtty_files = [
   'uvtty-frontend',
   'uvtty-session',
   'uvtty-backend',
   'uvtty-fe-connect',
+  'uvtty-be-run'
 ]
 
 foreach uvtty_file : uvtty_files
