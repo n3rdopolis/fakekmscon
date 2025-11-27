@@ -19,6 +19,20 @@ conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
 conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
 conf_data.set('sysconfdir', get_option('sysconfdir'))
 
+if get_option('prefix') == '/usr'
+  sysusers_dir = '/usr/lib/sysusers.d'
+  udev_dir = '/usr/lib/udev/rules.d'
+  initramfs_dir = '/usr/share/initramfs-tools'
+else
+  # Systemd won't look for the config files in other locations
+  # These don't really make sense as user-level configs either
+  sysusers_dir = '/etc/sysusers.d'
+  udev_dir = '/etc/udev/rules.d'
+
+  # And initramfs-tools doesn't look in /usr/local either
+  initramfs_dir = '/etc/initramfs-tools'
+endif
+
 bin_files = [
   'recinit',
   'uvtty-launch'
@@ -51,7 +65,8 @@ foreach dracut_file : dracut_files
     input: 'usr/lib/dracut/modules.d/99zz_recinit' / dracut_file + '.in',
     output: dracut_file,
     configuration: conf_data,
-    install_dir: get_option('prefix') / get_option('libdir') / 'dracut/modules.d/99zz_recinit'
+    # Dracut won't look elsewhere for modules
+    install_dir: '/usr/lib/dracut/modules.d/99zz_recinit'
   )
 endforeach
 
@@ -84,14 +99,14 @@ install_data(
   [
     'usr/lib/sysusers.d/vtty.conf',
   ],
-  install_dir: get_option('prefix') / get_option('libdir') / 'sysusers.d'
+  install_dir: sysusers_dir
 )
 
 install_data(
   [
     'usr/lib/udev/rules.d/72-seat-vtty.rules',
   ],
-  install_dir: get_option('prefix') / get_option('libdir') / 'udev/rules.d'
+  install_dir: udev_dir
 )
 
 install_data(
@@ -138,6 +153,7 @@ install_data(
   [
     'usr/share/bash-completion/completions/uvtty-launch',
   ],
+  # It might be possible for bash completions to be elsewhere...
   install_dir: get_option('prefix') / get_option('datadir') / 'bash-completion/completions'
 )
 
@@ -145,21 +161,22 @@ configure_file(
   input: 'usr/share/initramfs-tools/hooks/recinit-session.in',
   output: 'recinit-session',
   configuration: conf_data,
-  install_dir: get_option('prefix') / get_option('datadir') / 'initramfs-tools/hooks'
+  install_dir: initramfs_dir / 'hooks'
 )
 
 configure_file(
   input: 'usr/share/initramfs-tools/scripts/override/panic.in',
   output: 'panic',
   configuration: conf_data,
-  install_dir: get_option('prefix') / get_option('datadir') / 'initramfs-tools/scripts/override'
+  install_dir: initramfs_dir / 'scripts/override'
 )
 
 configure_file(
   input: 'usr/share/wayland-sessions/fullscreenterminal.desktop.in',
   output: 'usr/share/wayland-sessions/fullscreenterminal.desktop',
   configuration: conf_data,
-  install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
+  # Don't know if there are other places these files can be
+  install_dir: '/usr/share/wayland-sessions'
 )
 
 install_data(
@@ -173,5 +190,6 @@ install_data(
   [
     'etc/pam.d/vtty'
   ],
-  install_dir: get_option('sysconfdir') / 'pam.d'
+  # PAM doesn't look anywhere else
+  install_dir: '/etc/pam.d'
 )
