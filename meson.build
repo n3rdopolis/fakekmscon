@@ -1,107 +1,183 @@
 project('fakekmscon', [],
   version: '0.0.0',
   license: 'GPLv2+',
-  default_options: [],
+  default_options: ['prefix=/usr'],
 )
 
+# Just a crude check, neither necessary nor sufficient to ensure
+# a good install
+if get_option('prefix') != '/usr'
+  warning(
+    '\n    fakekmscon was designed to be installed to a prefix of /usr. Installing to',
+    '\n    other prefixes may have undesired effects such as files not being present',
+    '\n    where fakekmscon or other services look for them.'
+  )
+endif
 
-install_data(
-  [
-    'usr/bin/recinit',
-    'usr/bin/uvtty-launch',
-    'usr/bin/vtty-toggle',
-  ],
-  install_dir: '/usr/bin'
-)
+conf_data = configuration_data()
+conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
+conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
+conf_data.set('sysconfdir', get_option('sysconfdir'))
 
-install_data(
-  [
-    'usr/lib/dracut/modules.d/99zz_recinit/dracut-lib-recinit-shell.sh',
-    'usr/lib/dracut/modules.d/99zz_recinit/module-setup.sh',
-    'usr/lib/dracut/modules.d/99zz_recinit/recinit-dracut-emergency',
-  ],
-  install_dir: '/usr/lib/dracut/modules.d/99zz_recinit'
-)
+if get_option('prefix') == '/usr'
+  sysusers_dir = '/usr/lib/sysusers.d'
+  udev_dir = '/usr/lib/udev/rules.d'
+  initramfs_dir = '/usr/share/initramfs-tools'
+else
+  # Systemd won't look for the config files in other locations
+  # These don't really make sense as user-level configs either
+  sysusers_dir = '/etc/sysusers.d'
+  udev_dir = '/etc/udev/rules.d'
+
+  # And initramfs-tools doesn't look in /usr/local either
+  initramfs_dir = '/etc/initramfs-tools'
+endif
+
+bin_files = [
+  'recinit',
+  'uvtty-launch',
+  'vtty-toggle',
+]
+
+foreach bin_file : bin_files
+  configure_file(
+    input: 'usr/bin' / bin_file + '.in',
+    output: bin_file,
+    configuration: conf_data,
+    install_dir: get_option('prefix') / get_option('bindir')
+  )
+endforeach
+
+dracut_files = [
+  'dracut-lib-recinit-shell.sh',
+  'module-setup.sh',
+  'recinit-dracut-emergency',
+]
+
+foreach dracut_file : dracut_files
+  configure_file(
+    input: 'usr/lib/dracut/modules.d/99zz_recinit' / dracut_file + '.in',
+    output: dracut_file,
+    configuration: conf_data,
+    # Dracut won't look elsewhere for modules
+    install_dir: '/usr/lib/dracut/modules.d/99zz_recinit'
+  )
+endforeach
 
 install_data(
   [
     'usr/lib/systemd/system/recinit-emergency.service',
     'usr/lib/systemd/system/recinit-rescue.service',
   ],
-  install_dir: '/usr/lib/systemd/system'
+  install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
 )
 
-install_data(
-  [
-    'usr/lib/systemd/system/vtty-backend-seat@.service',
-    'usr/lib/systemd/system/vtty-backend@.service',
-    'usr/lib/systemd/system/vtty-frontend-seat@.service',
-    'usr/lib/systemd/system/vtty-frontend@.service',
-    'usr/lib/systemd/system/vtty-seatmanager.service',
-  ],
-  install_dir: '/usr/lib/systemd/system'
-)
+service_files = [
+  'vtty-frontend@.service', 
+  'vtty-backend-seat@.service', 
+  'vtty-backend@.service', 
+  'vtty-frontend-seat@.service',
+  'vtty-seatmanager.service',
+]
+
+foreach service_file : service_files
+  configure_file(
+    input: 'usr/lib/systemd/system' / service_file + '.in',
+    output: service_file,
+    configuration: conf_data,
+    install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
+  )
+endforeach
 
 install_data(
   [
     'usr/lib/sysusers.d/vtty.conf',
   ],
-  install_dir: '/usr/lib/sysusers.d'
+  install_dir: sysusers_dir
 )
 
 install_data(
   [
     'usr/lib/udev/rules.d/72-seat-vtty.rules',
   ],
-  install_dir: '/usr/lib/udev/rules.d'
+  install_dir: udev_dir
 )
 
-install_data(
-  [
-    'usr/libexec/uvtty/uvtty-backend',
-    'usr/libexec/uvtty/uvtty-be-run',
-    'usr/libexec/uvtty/uvtty-fe-connect',
-    'usr/libexec/uvtty/uvtty-frontend',
-    'usr/libexec/uvtty/uvtty-session',
-  ],
-  install_dir: '/usr/libexec/uvtty'
-)
+uvtty_files = [
+  'uvtty-frontend',
+  'uvtty-session',
+  'uvtty-backend',
+  'uvtty-fe-connect',
+  'uvtty-be-run'
+]
 
-install_data(
-  [
-    'usr/libexec/vtty/vtty-backend',
-    'usr/libexec/vtty/vtty-be-login',
-    'usr/libexec/vtty/vtty-fe-connect',
-    'usr/libexec/vtty/vtty-frontend',
-    'usr/libexec/vtty/vtty-seatmanager',
-  ],
-  install_dir: '/usr/libexec/vtty'
-)
+foreach uvtty_file : uvtty_files
+  configure_file(
+    input: 'usr/libexec/uvtty' / uvtty_file + '.in',
+    output: uvtty_file,
+    configuration: conf_data,
+    install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty'
+  )
+endforeach
+
+vtty_files = [
+  'vtty-frontend',
+  'vtty-backend',
+  'vtty-be-login',
+  'vtty-fe-connect',
+  'vtty-seatmanager',
+]
+
+foreach vtty_file : vtty_files
+  configure_file(
+    input: 'usr/libexec/vtty' / vtty_file + '.in',
+    output: vtty_file,
+    configuration: conf_data,
+    install_dir: get_option('prefix') / get_option('libexecdir') / 'vtty'
+  )
+endforeach
 
 install_data(
   [
     'usr/share/bash-completion/completions/uvtty-launch',
   ],
-  install_dir: '/usr/share/bash-completion/completions'
+  # It might be possible for bash completions to be elsewhere...
+  install_dir: get_option('prefix') / get_option('datadir') / 'bash-completion/completions'
 )
 
-install_data(
-  [
-    'usr/share/initramfs-tools/hooks/recinit',
-  ],
-  install_dir: '/usr/share/initramfs-tools/hooks'
+configure_file(
+  input: 'usr/share/initramfs-tools/hooks/recinit-session.in',
+  output: 'recinit-session',
+  configuration: conf_data,
+  install_dir: initramfs_dir / 'hooks'
 )
 
-install_data(
-  [
-    'usr/share/initramfs-tools/scripts/override/panic',
-  ],
-  install_dir: '/usr/share/initramfs-tools/scripts/override'
+configure_file(
+  input: 'usr/share/initramfs-tools/scripts/override/panic.in',
+  output: 'panic',
+  configuration: conf_data,
+  install_dir: initramfs_dir / 'scripts/override'
 )
 
-install_data(
-  [
-    'usr/share/wayland-sessions/fullscreenterminal.desktop',
-  ],
+configure_file(
+  input: 'usr/share/wayland-sessions/fullscreenterminal.desktop.in',
+  output: 'usr/share/wayland-sessions/fullscreenterminal.desktop',
+  configuration: conf_data,
+  # Don't know if there are other places these files can be
   install_dir: '/usr/share/wayland-sessions'
+)
+
+install_data(
+  [
+    'etc/footkiosk.conf',
+  ],
+  install_dir: get_option('sysconfdir')
+)
+
+install_data(
+  [
+    'etc/pam.d/vtty'
+  ],
+  # PAM doesn't look anywhere else
+  install_dir: '/etc/pam.d'
 )

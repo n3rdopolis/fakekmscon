@@ -87,7 +87,7 @@ function UvTTYFrontendMain
 
     cage -m last -d -s -- \
     foot --font DejaVuSansMono:size=9 -- \
-    /usr/libexec/uvtty/uvtty-fe-connect $UvTTYName &
+    @libexecdir@/uvtty/uvtty-fe-connect $UvTTYName &
     CAGEPID=$!
 
     mkdir -p "$XDG_RUNTIME_DIR/uvtty/$UvTTYName"
