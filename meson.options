@@ -1,19 +1,19 @@
 option(
   'systemdsystemunitdir',
   type: 'string',
-  description: 'systemd system unit directory'
+  description: 'systemd system unit directory',
 )
 
 option(
   'sysusersdir',
   type: 'string',
-  description: 'systemd-sysusers directory'
+  description: 'systemd-sysusers directory',
 )
 
 option(
   'udevrulesdir',
   type: 'string',
-  description: 'udev rules directory'
+  description: 'udev rules directory',
 )
 
 option(

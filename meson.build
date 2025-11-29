@@ -1,28 +1,44 @@
-project('fakekmscon', [],
+project(
+  'fakekmscon',
   version: '0.0.0',
-  meson_version: '>= 1.1.0', # for feature.enable_auto_if()
+  meson_version: '>= 1.1.0',  # for feature.enable_auto_if()
   license: 'GPLv2+',
 )
 
 systemdsystemunitdir = get_option('systemdsystemunitdir')
 if systemdsystemunitdir == ''
-  systemd_dep = dependency('systemd', required: true)
-  systemdsystemunitdir = systemd_dep.get_variable(pkgconfig: 'systemdsystemunitdir',
-                                                  pkgconfig_define: ['prefix', get_option('prefix')])
+  systemd_dep = dependency(
+    'systemd',
+    required: true,
+  )
+  systemdsystemunitdir = systemd_dep.get_variable(
+    pkgconfig: 'systemdsystemunitdir',
+    pkgconfig_define: ['prefix', get_option('prefix')],
+  )
 endif
 
 sysusersdir = get_option('sysusersdir')
 if sysusersdir == ''
-  systemd_dep = dependency('systemd', required: true)
-  sysusersdir = systemd_dep.get_variable(pkgconfig: 'sysusersdir',
-                                         pkgconfig_define: ['prefix', get_option('prefix')])
+  systemd_dep = dependency(
+    'systemd',
+    required: true,
+  )
+  sysusersdir = systemd_dep.get_variable(
+    pkgconfig: 'sysusersdir',
+    pkgconfig_define: ['prefix', get_option('prefix')],
+  )
 endif
 
 sysusersdir = get_option('sysusersdir')
 if sysusersdir == ''
-  systemd_dep = dependency('systemd', required: true)
-  sysusersdir = systemd_dep.get_variable(pkgconfig: 'sysusersdir',
-                                         pkgconfig_define: ['prefix', get_option('prefix')])
+  systemd_dep = dependency(
+    'systemd',
+    required: true,
+  )
+  sysusersdir = systemd_dep.get_variable(
+    pkgconfig: 'sysusersdir',
+    pkgconfig_define: ['prefix', get_option('prefix')],
+  )
 endif
 
 udevrulesdir = get_option('udevrulesdir')
@@ -38,14 +54,19 @@ dracut = get_option('dracut')
 # dependency() is fine here as dracut installs a pkgconf file
 # Technically, we also don't need dracut itself to be installed to be able to
 # install the modules, so don't make it a hard dependency.
-dracut_dep = dependency('dracut', required: false)
+dracut_dep = dependency(
+  'dracut',
+  required: false,
+)
 dracut = dracut.enable_auto_if(dracut_dep.found())
 
 if dracut.enabled()
   dracutmodulesdir = get_option('dracutmodulesdir')
   if dracutmodulesdir == '' and dracut_dep.found()
-    dracutmodulesdir = dracut_dep.get_variable(pkgconfig: 'dracutmodulesdir',
-                                               pkgconfig_define: ['prefix', get_option('prefix')])
+    dracutmodulesdir = dracut_dep.get_variable(
+      pkgconfig: 'dracutmodulesdir',
+      pkgconfig_define: ['prefix', get_option('prefix')],
+    )
   endif
   if dracutmodulesdir == ''
     # dracut does NOT appear to support /usr/local/lib/dracut, hence if the
@@ -59,7 +80,10 @@ initramfs_tools = get_option('initramfs-tools')
 # generate or install a pkgconf file of any kind. Hence, look for the binary
 # update-initramfs — which seems to be distinctive to initramfs-tools — as a
 # best guess.
-update_initramfs = find_program('update-initramfs', required: false)
+update_initramfs = find_program(
+  'update-initramfs',
+  required: false,
+)
 initramfs_tools = initramfs_tools.enable_auto_if(update_initramfs.found())
 
 if initramfs_tools.enabled()
@@ -95,18 +119,14 @@ conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
 conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
 conf_data.set('sysconfdir', get_option('sysconfdir'))
 
-bin_files = [
-  'recinit',
-  'uvtty-launch',
-  'vtty-toggle',
-]
+bin_files = ['recinit', 'uvtty-launch', 'vtty-toggle']
 
 foreach bin_file : bin_files
   configure_file(
     input: 'usr/bin' / bin_file + '.in',
     output: bin_file,
     configuration: conf_data,
-    install_dir: get_option('prefix') / get_option('bindir')
+    install_dir: get_option('prefix') / get_option('bindir'),
   )
 endforeach
 
@@ -137,9 +157,9 @@ install_data(
 )
 
 service_files = [
-  'vtty-frontend@.service', 
-  'vtty-backend-seat@.service', 
-  'vtty-backend@.service', 
+  'vtty-frontend@.service',
+  'vtty-backend-seat@.service',
+  'vtty-backend@.service',
   'vtty-frontend-seat@.service',
   'vtty-seatmanager.service',
 ]
@@ -154,17 +174,13 @@ foreach service_file : service_files
 endforeach
 
 install_data(
-  [
-    'usr/lib/sysusers.d/vtty.conf',
-  ],
-  install_dir: sysusersdir
+  'usr/lib/sysusers.d/vtty.conf',
+  install_dir: sysusersdir,
 )
 
 install_data(
-  [
-    'usr/lib/udev/rules.d/72-seat-vtty.rules',
-  ],
-  install_dir: udevrulesdir
+  'usr/lib/udev/rules.d/72-seat-vtty.rules',
+  install_dir: udevrulesdir,
 )
 
 uvtty_files = [
@@ -172,7 +188,7 @@ uvtty_files = [
   'uvtty-session',
   'uvtty-backend',
   'uvtty-fe-connect',
-  'uvtty-be-run'
+  'uvtty-be-run',
 ]
 
 foreach uvtty_file : uvtty_files
@@ -180,7 +196,7 @@ foreach uvtty_file : uvtty_files
     input: 'usr/libexec/uvtty' / uvtty_file + '.in',
     output: uvtty_file,
     configuration: conf_data,
-    install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty'
+    install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty',
   )
 endforeach
 
@@ -197,16 +213,14 @@ foreach vtty_file : vtty_files
     input: 'usr/libexec/vtty' / vtty_file + '.in',
     output: vtty_file,
     configuration: conf_data,
-    install_dir: get_option('prefix') / get_option('libexecdir') / 'vtty'
+    install_dir: get_option('prefix') / get_option('libexecdir') / 'vtty',
   )
 endforeach
 
 install_data(
-  [
-    'usr/share/bash-completion/completions/uvtty-launch',
-  ],
+  'usr/share/bash-completion/completions/uvtty-launch',
   # It might be possible for bash completions to be elsewhere...
-  install_dir: get_option('prefix') / get_option('datadir') / 'bash-completion/completions'
+  install_dir: get_option('prefix') / get_option('datadir') / 'bash-completion/completions',
 )
 
 if initramfs_tools.enabled()
@@ -214,14 +228,14 @@ if initramfs_tools.enabled()
     input: 'usr/share/initramfs-tools/hooks/recinit-session.in',
     output: 'recinit-session',
     configuration: conf_data,
-    install_dir: initramfstoolsdir / 'hooks'
+    install_dir: initramfstoolsdir / 'hooks',
   )
 
   configure_file(
     input: 'usr/share/initramfs-tools/scripts/override/panic.in',
     output: 'panic',
     configuration: conf_data,
-    install_dir: initramfstoolsdir / 'scripts/override'
+    install_dir: initramfstoolsdir / 'scripts/override',
   )
 endif
 
@@ -233,17 +247,13 @@ configure_file(
 )
 
 install_data(
-  [
-    'etc/footkiosk.conf',
-  ],
-  install_dir: get_option('sysconfdir')
+  'etc/footkiosk.conf',
+  install_dir: get_option('sysconfdir'),
 )
 
 if pam
   install_data(
-    [
-      'etc/pam.d/vtty'
-    ],
+    'etc/pam.d/vtty',
     install_dir: pamconfdir,
   )
 endif
