@@ -169,7 +169,7 @@ configure_file(
 
 configure_file(
   input: 'usr/share/wayland-sessions/fullscreenterminal.desktop.in',
-  output: 'usr/share/wayland-sessions/fullscreenterminal.desktop',
+  output: 'fullscreenterminal.desktop',
   configuration: conf_data,
   # Don't know if there are other places these files can be
   install_dir: '/usr/share/wayland-sessions'
