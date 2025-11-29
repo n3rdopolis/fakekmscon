@@ -35,19 +35,23 @@ if sysusersdir == ''
                                          pkgconfig_define: ['prefix', get_option('prefix')])
 endif
 
+udevrulesdir = get_option('udevrulesdir')
+if udevrulesdir == ''
+  # systemd doesn't appear to have a variable for this in its pkgconf file?
+  # prefix seems to be fine here, as systemd appears to also support rules
+  # in /usr/local:
+  # https://github.com/systemd/systemd/blob/main/src/basic/constants.h#L37-L52
+  udevrulesdir = get_option('prefix') / 'lib/udev/rules.d'
+endif
+
 conf_data = configuration_data()
 conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
 conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
 conf_data.set('sysconfdir', get_option('sysconfdir'))
 
 if get_option('prefix') == '/usr'
-  udev_dir = '/usr/lib/udev/rules.d'
   initramfs_dir = '/usr/share/initramfs-tools'
 else
-  # Systemd won't look for the config files in other locations
-  # These don't really make sense as user-level configs either
-  udev_dir = '/etc/udev/rules.d'
-
   # And initramfs-tools doesn't look in /usr/local either
   initramfs_dir = '/etc/initramfs-tools'
 endif
@@ -119,7 +123,7 @@ install_data(
   [
     'usr/lib/udev/rules.d/72-seat-vtty.rules',
   ],
-  install_dir: udev_dir
+  install_dir: udevrulesdir
 )
 
 uvtty_files = [

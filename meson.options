@@ -9,3 +9,9 @@ option(
   type: 'string',
   description: 'systemd-sysusers directory'
 )
+
+option(
+  'udevrulesdir',
+  type: 'string',
+  description: 'udev rules directory'
+)
