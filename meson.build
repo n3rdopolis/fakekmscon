@@ -93,6 +93,14 @@ if waylandsessionsdir == ''
   waylandsessionsdir = get_option('prefix') / 'share/wayland-sessions'
 endif
 
+pam = get_option('pam')
+if pam
+  pamconfdir = get_option('pamconfdir')
+  if pamconfdir == ''
+    pamconfdir = get_option('prefix') / 'lib/pam.d'
+  endif
+endif
+
 conf_data = configuration_data()
 conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
 conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
@@ -242,10 +250,11 @@ install_data(
   install_dir: get_option('sysconfdir')
 )
 
-install_data(
-  [
-    'etc/pam.d/vtty'
-  ],
-  # PAM doesn't look anywhere else
-  install_dir: '/etc/pam.d'
-)
+if pam
+  install_data(
+    [
+      'etc/pam.d/vtty'
+    ],
+    install_dir: pamconfdir,
+  )
+endif

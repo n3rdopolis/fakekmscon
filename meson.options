@@ -47,3 +47,16 @@ option(
   type: 'string',
   description: 'wayland-sessions directory',
 )
+
+option(
+  'pam',
+  type: 'boolean',
+  value: true,
+  description: 'Install the default vtty PAM stack',
+)
+
+option(
+  'pamconfdir',
+  type: 'string',
+  description: 'PAM configuration directory',
+)
