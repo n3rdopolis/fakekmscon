@@ -2,18 +2,7 @@ project('fakekmscon', [],
   version: '0.0.0',
   meson_version: '>= 1.1.0', # for feature.enable_auto_if()
   license: 'GPLv2+',
-  default_options: ['prefix=/usr'],
 )
-
-# Just a crude check, neither necessary nor sufficient to ensure
-# a good install
-if get_option('prefix') != '/usr'
-  warning(
-    '\n    fakekmscon was designed to be installed to a prefix of /usr. Installing to',
-    '\n    other prefixes may have undesired effects such as files not being present',
-    '\n    where fakekmscon or other services look for them.'
-  )
-endif
 
 systemdsystemunitdir = get_option('systemdsystemunitdir')
 if systemdsystemunitdir == ''
