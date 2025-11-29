@@ -15,3 +15,29 @@ option(
   type: 'string',
   description: 'udev rules directory'
 )
+
+option(
+  'dracut',
+  type: 'feature',
+  value: 'auto',
+  description: 'Enable dracut support',
+)
+
+option(
+  'dracutmodulesdir',
+  type: 'string',
+  description: 'dracut modules directory',
+)
+
+option(
+  'initramfs-tools',
+  type: 'feature',
+  value: 'auto',
+  description: 'Enable initramfs-tools support',
+)
+
+option(
+  'initramfstoolsdir',
+  type: 'string',
+  description: 'initramfs-tools directory',
+)
