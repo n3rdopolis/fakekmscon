@@ -3,6 +3,7 @@ project(
   version: '0.0.0',
   meson_version: '>= 1.1.0',  # for feature.enable_auto_if()
   license: 'GPLv2+',
+  license_files: 'COPYING.txt',
 )
 
 bashcompletiondir = get_option('bashcompletiondir')
