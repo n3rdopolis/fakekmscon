@@ -85,6 +85,14 @@ if initramfs_tools.enabled()
   endif
 endif
 
+waylandsessionsdir = get_option('waylandsessionsdir')
+if waylandsessionsdir == ''
+  # gdm iterates through XDG_DATA_DIRS (which normally contains /usr/local in
+  # its search path), and sddm explicitly checks /usr/local first. Hence, we
+  # may as well just respect prefix here.
+  waylandsessionsdir = get_option('prefix') / 'share/wayland-sessions'
+endif
+
 conf_data = configuration_data()
 conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
 conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
@@ -224,8 +232,7 @@ configure_file(
   input: 'usr/share/wayland-sessions/fullscreenterminal.desktop.in',
   output: 'fullscreenterminal.desktop',
   configuration: conf_data,
-  # Don't know if there are other places these files can be
-  install_dir: '/usr/share/wayland-sessions'
+  install_dir: waylandsessionsdir,
 )
 
 install_data(

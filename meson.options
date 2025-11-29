@@ -41,3 +41,9 @@ option(
   type: 'string',
   description: 'initramfs-tools directory',
 )
+
+option(
+  'waylandsessionsdir',
+  type: 'string',
+  description: 'wayland-sessions directory',
+)
