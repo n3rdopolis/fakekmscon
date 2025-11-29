@@ -3,3 +3,9 @@ option(
   type: 'string',
   description: 'systemd system unit directory'
 )
+
+option(
+  'sysusersdir',
+  type: 'string',
+  description: 'systemd-sysusers directory'
+)

@@ -14,12 +14,25 @@ if get_option('prefix') != '/usr'
   )
 endif
 
-
 systemdsystemunitdir = get_option('systemdsystemunitdir')
 if systemdsystemunitdir == ''
   systemd_dep = dependency('systemd', required: true)
   systemdsystemunitdir = systemd_dep.get_variable(pkgconfig: 'systemdsystemunitdir',
                                                   pkgconfig_define: ['prefix', get_option('prefix')])
+endif
+
+sysusersdir = get_option('sysusersdir')
+if sysusersdir == ''
+  systemd_dep = dependency('systemd', required: true)
+  sysusersdir = systemd_dep.get_variable(pkgconfig: 'sysusersdir',
+                                         pkgconfig_define: ['prefix', get_option('prefix')])
+endif
+
+sysusersdir = get_option('sysusersdir')
+if sysusersdir == ''
+  systemd_dep = dependency('systemd', required: true)
+  sysusersdir = systemd_dep.get_variable(pkgconfig: 'sysusersdir',
+                                         pkgconfig_define: ['prefix', get_option('prefix')])
 endif
 
 conf_data = configuration_data()
@@ -28,13 +41,11 @@ conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
 conf_data.set('sysconfdir', get_option('sysconfdir'))
 
 if get_option('prefix') == '/usr'
-  sysusers_dir = '/usr/lib/sysusers.d'
   udev_dir = '/usr/lib/udev/rules.d'
   initramfs_dir = '/usr/share/initramfs-tools'
 else
   # Systemd won't look for the config files in other locations
   # These don't really make sense as user-level configs either
-  sysusers_dir = '/etc/sysusers.d'
   udev_dir = '/etc/udev/rules.d'
 
   # And initramfs-tools doesn't look in /usr/local either
@@ -101,7 +112,7 @@ install_data(
   [
     'usr/lib/sysusers.d/vtty.conf',
   ],
-  install_dir: sysusers_dir
+  install_dir: sysusersdir
 )
 
 install_data(
