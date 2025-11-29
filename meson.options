@@ -1,4 +1,10 @@
 option(
+  'bashcompletiondir',
+  type: 'string',
+  description: 'bash completion directory',
+)
+
+option(
   'systemdsystemunitdir',
   type: 'string',
   description: 'systemd system unit directory',

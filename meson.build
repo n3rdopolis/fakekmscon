@@ -5,6 +5,22 @@ project(
   license: 'GPLv2+',
 )
 
+bashcompletiondir = get_option('bashcompletiondir')
+if bashcompletiondir == ''
+  bash_completion_dep = dependency(
+    'bash-completion',
+    required: false,
+  )
+  if bash_completion_dep.found()
+    bashcompletiondir = bash_completion_dep.get_variable(
+      pkgconfig: 'completionsdir',
+      pkgconfig_define: ['prefix', get_option('prefix')],
+    )
+  else
+    bashcompletiondir = get_option('prefix') / get_option('datadir') / 'bash-completion/completions'
+  endif
+endif
+
 systemdsystemunitdir = get_option('systemdsystemunitdir')
 if systemdsystemunitdir == ''
   systemd_dep = dependency(
@@ -219,8 +235,7 @@ endforeach
 
 install_data(
   'usr/share/bash-completion/completions/uvtty-launch',
-  # It might be possible for bash completions to be elsewhere...
-  install_dir: get_option('prefix') / get_option('datadir') / 'bash-completion/completions',
+  install_dir: bashcompletiondir,
 )
 
 if initramfs_tools.enabled()
