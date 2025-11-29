@@ -14,6 +14,14 @@ if get_option('prefix') != '/usr'
   )
 endif
 
+
+systemdsystemunitdir = get_option('systemdsystemunitdir')
+if systemdsystemunitdir == ''
+  systemd_dep = dependency('systemd', required: true)
+  systemdsystemunitdir = systemd_dep.get_variable(pkgconfig: 'systemdsystemunitdir',
+                                                  pkgconfig_define: ['prefix', get_option('prefix')])
+endif
+
 conf_data = configuration_data()
 conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
 conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
@@ -69,7 +77,7 @@ install_data(
     'usr/lib/systemd/system/recinit-emergency.service',
     'usr/lib/systemd/system/recinit-rescue.service',
   ],
-  install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
+  install_dir: systemdsystemunitdir,
 )
 
 service_files = [
@@ -85,7 +93,7 @@ foreach service_file : service_files
     input: 'usr/lib/systemd/system' / service_file + '.in',
     output: service_file,
     configuration: conf_data,
-    install_dir: get_option('prefix') / get_option('libdir') / 'systemd/system'
+    install_dir: systemdsystemunitdir,
   )
 endforeach
 
