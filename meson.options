@@ -1,0 +1,68 @@
+option(
+  'bashcompletiondir',
+  type: 'string',
+  description: 'bash completion directory',
+)
+
+option(
+  'systemdsystemunitdir',
+  type: 'string',
+  description: 'systemd system unit directory',
+)
+
+option(
+  'sysusersdir',
+  type: 'string',
+  description: 'systemd-sysusers directory',
+)
+
+option(
+  'udevrulesdir',
+  type: 'string',
+  description: 'udev rules directory',
+)
+
+option(
+  'dracut',
+  type: 'feature',
+  value: 'auto',
+  description: 'Enable dracut support',
+)
+
+option(
+  'dracutmodulesdir',
+  type: 'string',
+  description: 'dracut modules directory',
+)
+
+option(
+  'initramfs-tools',
+  type: 'feature',
+  value: 'auto',
+  description: 'Enable initramfs-tools support',
+)
+
+option(
+  'initramfstoolsdir',
+  type: 'string',
+  description: 'initramfs-tools directory',
+)
+
+option(
+  'waylandsessionsdir',
+  type: 'string',
+  description: 'wayland-sessions directory',
+)
+
+option(
+  'pam',
+  type: 'boolean',
+  value: true,
+  description: 'Install the default vtty PAM stack',
+)
+
+option(
+  'pamconfdir',
+  type: 'string',
+  description: 'PAM configuration directory',
+)
