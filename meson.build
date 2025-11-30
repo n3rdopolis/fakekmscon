@@ -46,18 +46,6 @@ if sysusersdir == ''
   )
 endif
 
-sysusersdir = get_option('sysusersdir')
-if sysusersdir == ''
-  systemd_dep = dependency(
-    'systemd',
-    required: true,
-  )
-  sysusersdir = systemd_dep.get_variable(
-    pkgconfig: 'sysusersdir',
-    pkgconfig_define: ['prefix', get_option('prefix')],
-  )
-endif
-
 udevrulesdir = get_option('udevrulesdir')
 if udevrulesdir == ''
   # systemd doesn't appear to have a variable for this in its pkgconf file?
@@ -133,7 +121,6 @@ endif
 
 conf_data = configuration_data()
 conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
-conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
 conf_data.set('sysconfdir', get_option('sysconfdir'))
 
 bin_files = ['recinit', 'uvtty-launch', 'vtty-toggle']
