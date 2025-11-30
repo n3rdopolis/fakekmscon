@@ -49,6 +49,19 @@ option(
 )
 
 option(
+  'mkinitcpio',
+  type: 'feature',
+  value: 'auto',
+  description: 'Enable mkinitcpio support',
+)
+
+option(
+  'mkinitcpiodir',
+  type: 'string',
+  description: 'mkinitcpio directory',
+)
+
+option(
   'waylandsessionsdir',
   type: 'string',
   description: 'wayland-sessions directory',
