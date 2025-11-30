@@ -1,0 +1,6 @@
+#!/usr/bin/ash
+
+run_emergencyhook() {
+    # Stub implementation of an emergency hook for initcpio
+    echo "recinit installed to this initcpio, try running it?"
+}
