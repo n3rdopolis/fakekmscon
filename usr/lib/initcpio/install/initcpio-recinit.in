@@ -1,0 +1,108 @@
+#!/usr/bin/bash
+
+build() {
+    add_binary cage
+    add_binary foot
+    add_binary recinit
+    add_binary id
+
+    add_module evdev
+    add_udev_rule /lib/udev/rules.d/60-input-id.rules
+
+    #Workaround for older versions of Cage
+    add_binary /bin/true /usr/bin/Xwayland
+
+    MonospaceFontPath=$(fc-match -f %{file} monospace)
+    if [ -n $MonospaceFontPath ]
+    then
+        add_file "$MonospaceFontPath"
+    fi
+
+    BoldMonospaceFontPath=$(fc-match -f %{file} monospace:weight=bold)
+    if [ -n $BoldMonospaceFont ]
+    then
+        add_file "$BoldMonospaceFontPath"
+    fi
+
+    if [ -e /usr/lib/locale/[cC].[uU][tT][fF]*8/ ]
+    then
+        CUTF8DIR=$(basename $(ls -d /usr/lib/locale/[cC].[uU][tT][fF]*8))
+        add_full_dir /usr/lib/locale/$CTUF8DIR
+    fi
+
+    if [ -e /usr/share/libinput ]
+    then
+        add_full_dir /usr/share/libinput
+    fi
+
+    if [ -e /usr/share/X11/xkb ]
+    then
+        add_file /usr/share/X11/xkb/compat/accessx
+        add_file /usr/share/X11/xkb/compat/basic
+        add_file /usr/share/X11/xkb/compat/caps
+        add_file /usr/share/X11/xkb/compat/complete
+        add_file /usr/share/X11/xkb/compat/iso9995
+        add_file /usr/share/X11/xkb/compat/ledcaps
+        add_file /usr/share/X11/xkb/compat/lednum
+        add_file /usr/share/X11/xkb/compat/ledscroll
+        add_file /usr/share/X11/xkb/compat/level5
+        add_file /usr/share/X11/xkb/compat/misc
+        add_file /usr/share/X11/xkb/compat/mousekeys
+        add_file /usr/share/X11/xkb/compat/xfree86
+        add_file /usr/share/X11/xkb/keycodes/aliases
+        add_file /usr/share/X11/xkb/keycodes/evdev
+        add_file /usr/share/X11/xkb/rules/evdev
+        find /usr/share/X11/xkb/symbols -maxdepth 1 ! -type d | while read -r file
+        do
+            add_file "$file"
+        done
+        add_file /usr/share/X11/xkb/types/basic
+        add_file /usr/share/X11/xkb/types/complete
+        add_file /usr/share/X11/xkb/types/extra
+        add_file /usr/share/X11/xkb/types/iso9995
+        add_file /usr/share/X11/xkb/types/level5
+        add_file /usr/share/X11/xkb/types/mousekeys
+        add_file /usr/share/X11/xkb/types/numpad
+        add_file /usr/share/X11/xkb/types/pc
+    fi
+
+    if [ -e /usr/share/X11/locale ]
+    then
+        # In the off chance the user uses their compose key in initrd
+        if [ -f "/usr/share/X11/locale/compose.dir" ]
+        then
+            add_file /usr/share/X11/locale/compose.dir
+            grep UTF-8/Compose: /usr/share/X11/locale/compose.dir | awk -F: '{ print $1 }' | sort -u | xargs dirname | while read -r DIR
+            do
+                find /usr/share/X11/locale/$DIR -maxdepth 1 ! -type d | while read -r file
+                do
+                    add_file "$file"
+                done
+            done
+        fi
+    fi
+
+    if [ -e @sysconfdir@/footkiosk.conf ]
+    then
+        add_file @sysconfdir@/footkiosk.conf
+    fi
+
+    # Maybe starting the recinit session automatically is inadvisable,
+    # but this is how you'd do it. Might be enabled in the future.
+
+    #if command -v add_systemd_unit >/dev/null; then
+    #    # Option 1: The initcpio is systemd-based, in which case the 
+    #    # rescue and emergency service files should be added
+    #    add_systemd_unit recinit-emergency.service
+    #    add_systemd_unit recinit-rescue.service
+    #    add_symlink /usr/lib/systemd/system/emergency.target.wants/recinit-emergency.service ../recinit-emergency.service
+    #    add_symlink /usr/lib/systemd/system/rescue.target.wants/recinit-rescue.service ../recinit-rescue.service
+    #else
+    #    # Do people use the emergency hook anymore?
+    #    add_runscript recinit-initcpio-hook
+    #fi
+}
+
+help() {
+    echo "Copies files needed for running recinit into initcpio"
+}

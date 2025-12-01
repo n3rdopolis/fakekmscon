@@ -46,18 +46,6 @@ if sysusersdir == ''
   )
 endif
 
-sysusersdir = get_option('sysusersdir')
-if sysusersdir == ''
-  systemd_dep = dependency(
-    'systemd',
-    required: true,
-  )
-  sysusersdir = systemd_dep.get_variable(
-    pkgconfig: 'sysusersdir',
-    pkgconfig_define: ['prefix', get_option('prefix')],
-  )
-endif
-
 udevrulesdir = get_option('udevrulesdir')
 if udevrulesdir == ''
   # systemd doesn't appear to have a variable for this in its pkgconf file?
@@ -94,14 +82,28 @@ endif
 
 initramfs_tools = get_option('initramfs-tools')
 # initramfs-tools, or at least the debian version of it, does not appear to
-# generate or install a pkgconf file of any kind. Hence, look for the binary
-# update-initramfs — which seems to be distinctive to initramfs-tools — as a
-# best guess.
+# generate or install a pkgconf file of any kind. Hence, look for a handful 
+# of binaries characteristic to initramfs-tools as a best guess. 
+#
+# (Not perfectly reliable-- for instance, update_initramfs is also the name
+# of an unrelated utility by CachyOS)
 update_initramfs = find_program(
   'update-initramfs',
   required: false,
 )
-initramfs_tools = initramfs_tools.enable_auto_if(update_initramfs.found())
+unmkinitramfs = find_program(
+  'unmkinitramfs',
+  required: false
+)
+lsinitramfs = find_program(
+  'lsinitramfs',
+  required: false
+)
+initramfs_tools = initramfs_tools.enable_auto_if(
+  update_initramfs.found() and 
+  unmkinitramfs.found() and 
+  lsinitramfs.found()
+)
 
 if initramfs_tools.enabled()
   initramfstoolsdir = get_option('initramfstoolsdir')
@@ -111,6 +113,34 @@ if initramfs_tools.enabled()
     else
       # And initramfs-tools doesn't look in /usr/local either.
       initramfstoolsdir = '/etc/initramfs-tools'
+    endif
+  endif
+endif
+
+mkinitcpio = get_option('mkinitcpio')
+# mkinitcpio does not appear to have any associated pkgconf entries either
+# so look for the two associated binaries
+mkinitcpio_prog = find_program(
+  'mkinitcpio',
+  required: false,
+)
+lsinitcpio = find_program(
+  'lsinitcpio',
+  required: false,
+)
+mkinitcpio = mkinitcpio.enable_auto_if(
+  mkinitcpio_prog.found() and 
+  lsinitcpio.found()
+)
+
+if mkinitcpio.enabled()
+  mkinitcpiodir = get_option('mkinitcpiodir')
+  if mkinitcpiodir == ''
+    if get_option('prefix') == '/usr'
+      mkinitcpiodir = '/usr/lib/initcpio'
+    else
+      # And initramfs-tools doesn't look in /usr/local either.
+      mkinitcpiodir = '/etc/initcpio'
     endif
   endif
 endif
@@ -133,7 +163,6 @@ endif
 
 conf_data = configuration_data()
 conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
-conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
 conf_data.set('sysconfdir', get_option('sysconfdir'))
 
 bin_files = ['recinit', 'uvtty-launch', 'vtty-toggle']
@@ -252,6 +281,20 @@ if initramfs_tools.enabled()
     output: 'panic',
     configuration: conf_data,
     install_dir: initramfstoolsdir / 'scripts/override',
+  )
+endif
+
+if mkinitcpio.enabled()
+  install_data(
+    'usr/lib/initcpio/hooks/recinit-initcpio-hook',
+    install_dir: mkinitcpiodir / 'hooks',
+  )
+
+  configure_file(
+    input: 'usr/lib/initcpio/install/initcpio-recinit.in',
+    output: 'initcpio-recinit',
+    configuration: conf_data,
+    install_dir: mkinitcpiodir / 'install',
   )
 endif
 
