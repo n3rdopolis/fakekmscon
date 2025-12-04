@@ -270,8 +270,8 @@ install_data(
 
 if initramfs_tools.enabled()
   configure_file(
-    input: 'usr/share/initramfs-tools/hooks/recinit-session.in',
-    output: 'recinit-session',
+    input: 'usr/share/initramfs-tools/hooks/recinit-hook.in',
+    output: 'recinit-hook',
     configuration: conf_data,
     install_dir: initramfstoolsdir / 'hooks',
   )
