@@ -163,7 +163,7 @@ endif
 
 conf_data = configuration_data()
 conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
-conf_data.set('sysconfdir', get_option('sysconfdir'))
+conf_data.set('sysconfdir', get_option('prefix') / get_option('sysconfdir'))
 
 bin_files = ['recinit', 'uvtty-launch', 'vtty-toggle']
 
