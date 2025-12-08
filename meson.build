@@ -279,6 +279,7 @@ install_data(
 
 if initramfs_tools.enabled()
   configure_file(
+    #TODO rename to usr/share/initramfs-tools/hooks/recinit.in when Meson 1.10.0 is out for build_subdir
     input: 'usr/share/initramfs-tools/hooks/recinit-hook.in',
     output: 'recinit-hook',
     configuration: conf_data,
@@ -300,6 +301,7 @@ if mkinitcpio.enabled()
   )
 
   configure_file(
+    #TODO rename to usr/lib/initcpio/install/recinit.in when Meson 1.10.0 is out for build_subdir
     input: 'usr/lib/initcpio/install/initcpio-recinit.in',
     output: 'initcpio-recinit',
     configuration: conf_data,
