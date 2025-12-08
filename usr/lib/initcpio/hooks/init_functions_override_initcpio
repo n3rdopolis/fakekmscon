@@ -1,6 +1,25 @@
 #!/usr/bin/ash
 
-run_emergencyhook() {
-    # Stub implementation of an emergency hook for initcpio
-    echo "recinit installed to this initcpio, try running it?"
+launch_interactive_shell() {
+    if ls /dev/dri/card* 1> /dev/null 2>&1
+    then
+        HAS_MODESETTING_DEVICE=1
+    else
+        HAS_MODESETTING_DEVICE=0
+    fi
+    export PS1='[rootfs \W]\$ '
+
+    if [ -z $norecinit ] && [ $HAS_MODESETTING_DEVICE ] && [ ! -e /dev/tty0 ] && command -v recinit >/dev/null 2>&1; then
+        echo "Starting user mode recovery console. pass norecinit=1 to disable"
+        recinit -- sh -i
+    else
+        #This is from mkinitcpio
+
+        # explicitly redirect to /dev/console in case we're logging. note that
+        # anything done in the rescue shell will NOT be logged.
+        {
+            [ "$1" = "--exec" ] && exec sh -i
+            sh -i
+        } 0</dev/console 1>/dev/console 2>/dev/console
+    fi
 }

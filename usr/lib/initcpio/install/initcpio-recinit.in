@@ -87,20 +87,8 @@ build() {
         add_file @sysconfdir@/footkiosk.conf
     fi
 
-    # Maybe starting the recinit session automatically is inadvisable,
-    # but this is how you'd do it. Might be enabled in the future.
-
-    #if command -v add_systemd_unit >/dev/null; then
-    #    # Option 1: The initcpio is systemd-based, in which case the 
-    #    # rescue and emergency service files should be added
-    #    add_systemd_unit recinit-emergency.service
-    #    add_systemd_unit recinit-rescue.service
-    #    add_symlink /usr/lib/systemd/system/emergency.target.wants/recinit-emergency.service ../recinit-emergency.service
-    #    add_symlink /usr/lib/systemd/system/rescue.target.wants/recinit-rescue.service ../recinit-rescue.service
-    #else
-    #    # Do people use the emergency hook anymore?
-    #    add_runscript recinit-initcpio-hook
-    #fi
+    add_file @mkinitcpiodir@/hooks/init_functions_override_initcpio /init_functions_override
+    echo ". /init_functions_override" >> $BUILDROOT/init_functions
 }
 
 help() {

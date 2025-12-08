@@ -6,6 +6,10 @@ project(
   license_files: 'COPYING.txt',
 )
 
+conf_data = configuration_data()
+conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
+conf_data.set('sysconfdir', get_option('prefix') / get_option('sysconfdir'))
+
 bashcompletiondir = get_option('bashcompletiondir')
 if bashcompletiondir == ''
   bash_completion_dep = dependency(
@@ -21,6 +25,7 @@ if bashcompletiondir == ''
     bashcompletiondir = get_option('prefix') / get_option('datadir') / 'bash-completion/completions'
   endif
 endif
+conf_data.set('bashcompletiondir', bashcompletiondir)
 
 systemdsystemunitdir = get_option('systemdsystemunitdir')
 if systemdsystemunitdir == ''
@@ -33,6 +38,7 @@ if systemdsystemunitdir == ''
     pkgconfig_define: ['prefix', get_option('prefix')],
   )
 endif
+conf_data.set('systemdsystemunitdir', systemdsystemunitdir)
 
 sysusersdir = get_option('sysusersdir')
 if sysusersdir == ''
@@ -45,6 +51,7 @@ if sysusersdir == ''
     pkgconfig_define: ['prefix', get_option('prefix')],
   )
 endif
+conf_data.set('sysusersdir', sysusersdir)
 
 udevrulesdir = get_option('udevrulesdir')
 if udevrulesdir == ''
@@ -54,6 +61,7 @@ if udevrulesdir == ''
   # https://github.com/systemd/systemd/blob/main/src/basic/constants.h#L37-L52
   udevrulesdir = get_option('prefix') / 'lib/udev/rules.d'
 endif
+conf_data.set('udevrulesdir', udevrulesdir)
 
 dracut = get_option('dracut')
 # dependency() is fine here as dracut installs a pkgconf file
@@ -78,6 +86,7 @@ if dracut.enabled()
     # modules directory is not overridden don't respect prefix.
     dracutmodulesdir = '/usr/lib/dracut/modules.d'
   endif
+  conf_data.set('dracutmodulesdir', dracutmodulesdir)
 endif
 
 initramfs_tools = get_option('initramfs-tools')
@@ -115,6 +124,7 @@ if initramfs_tools.enabled()
       initramfstoolsdir = '/etc/initramfs-tools'
     endif
   endif
+  conf_data.set('initramfstoolsdir', initramfstoolsdir)
 endif
 
 mkinitcpio = get_option('mkinitcpio')
@@ -143,6 +153,7 @@ if mkinitcpio.enabled()
       mkinitcpiodir = '/etc/initcpio'
     endif
   endif
+  conf_data.set('mkinitcpiodir', mkinitcpiodir)
 endif
 
 waylandsessionsdir = get_option('waylandsessionsdir')
@@ -152,6 +163,7 @@ if waylandsessionsdir == ''
   # may as well just respect prefix here.
   waylandsessionsdir = get_option('prefix') / 'share/wayland-sessions'
 endif
+conf_data.set('waylandsessionsdir', waylandsessionsdir)
 
 pam = get_option('pam')
 if pam
@@ -160,10 +172,7 @@ if pam
     pamconfdir = get_option('prefix') / 'lib/pam.d'
   endif
 endif
-
-conf_data = configuration_data()
-conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
-conf_data.set('sysconfdir', get_option('prefix') / get_option('sysconfdir'))
+conf_data.set('pamconfdir', pamconfdir)
 
 bin_files = ['recinit', 'uvtty-launch', 'vtty-toggle']
 
@@ -286,7 +295,7 @@ endif
 
 if mkinitcpio.enabled()
   install_data(
-    'usr/lib/initcpio/hooks/recinit-initcpio-hook',
+    'usr/lib/initcpio/hooks/init_functions_override_initcpio',
     install_dir: mkinitcpiodir / 'hooks',
   )
 
