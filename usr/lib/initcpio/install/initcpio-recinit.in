@@ -87,7 +87,7 @@ build() {
         add_file @sysconfdir@/footkiosk.conf
     fi
 
-    add_file @mkinitcpiodir@/hooks/init_functions_override_initcpio /init_functions_override
+    add_file @mkinitcpiodir@/override/init_functions_override /init_functions_override
     echo ". /init_functions_override" >> $BUILDROOT/init_functions
 }
 

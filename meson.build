@@ -296,8 +296,8 @@ endif
 
 if mkinitcpio.enabled()
   install_data(
-    'usr/lib/initcpio/hooks/init_functions_override_initcpio',
-    install_dir: mkinitcpiodir / 'hooks',
+    'usr/lib/initcpio/override/init_functions_override',
+    install_dir: mkinitcpiodir / 'override',
   )
 
   configure_file(
