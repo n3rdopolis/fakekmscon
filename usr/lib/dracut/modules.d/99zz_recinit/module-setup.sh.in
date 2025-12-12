@@ -17,7 +17,8 @@ depends() {
 
 # called by dracut
 install() {
-    inst_multiple cage foot recinit id
+    inst_simple @bindir@/recinit /usr/bin/recinit
+    inst_multiple cage foot id
     instmods evdev
 
     inst_rules 60-input-id.rules

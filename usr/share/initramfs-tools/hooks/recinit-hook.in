@@ -25,9 +25,9 @@ then
   copy_exec /usr/bin/foot /usr/bin/
 fi
 
-if [ -e /usr/sbin/recinit ]
+if [ -e @bindir@/recinit ]
 then
-  copy_file script /usr/sbin/recinit
+  copy_file script @bindir@/recinit /usr/bin/recinit
 fi
 
 #Workaround for older versions of Cage

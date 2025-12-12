@@ -3,7 +3,7 @@
 build() {
     add_binary cage
     add_binary foot
-    add_binary recinit
+    add_file @bindir@/recinit /usr/bin/recinit
     add_binary id
 
     add_module evdev
