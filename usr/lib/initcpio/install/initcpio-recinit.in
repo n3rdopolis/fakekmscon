@@ -87,6 +87,11 @@ build() {
         add_file @sysconfdir@/footkiosk.conf
     fi
 
+    if declare -F add_systemd_unit &> /dev/null
+    then
+        add_systemd_unit recinit-emergency.service
+    fi
+
     add_file @mkinitcpiodir@/override/init_functions_override /init_functions_override
     echo ". /init_functions_override" >> $BUILDROOT/init_functions
 }
