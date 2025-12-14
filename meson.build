@@ -1,7 +1,7 @@
 project(
   'fakekmscon',
   version: '0.0.0',
-  meson_version: '>= 1.1.0',  # for feature.enable_auto_if()
+  meson_version: '>= 1.10.0',  # for build_subdir
   license: 'GPLv2+',
   license_files: 'COPYING.txt',
 )
@@ -182,6 +182,7 @@ foreach bin_file : bin_files
     input: 'usr/bin' / bin_file + '.in',
     output: bin_file,
     configuration: conf_data,
+    build_subdir: 'usr_bin/',
     install_dir: get_option('prefix') / get_option('bindir'),
   )
 endforeach
@@ -198,6 +199,7 @@ if dracut.enabled()
       input: 'usr/lib/dracut/modules.d/99zz_recinit' / dracut_file + '.in',
       output: dracut_file,
       configuration: conf_data,
+      build_subdir: 'usr_lib_dracut_modules.d_99zz_recinit/',
       # Dracut won't look elsewhere for modules
       install_dir: dracutmodulesdir / '99zz_recinit',
     )
@@ -219,6 +221,7 @@ foreach service_file : service_files
     input: 'usr/lib/systemd/system' / service_file + '.in',
     output: service_file,
     configuration: conf_data,
+    build_subdir: 'usr_lib_systemd_system',
     install_dir: systemdsystemunitdir,
   )
 endforeach
@@ -270,6 +273,7 @@ foreach uvtty_file : uvtty_files
     input: 'usr/libexec/uvtty' / uvtty_file + '.in',
     output: uvtty_file,
     configuration: conf_data,
+    build_subdir: 'usr_libexec_uvtty/',
     install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty',
   )
 endforeach
@@ -287,6 +291,7 @@ foreach vtty_file : vtty_files
     input: 'usr/libexec/vtty' / vtty_file + '.in',
     output: vtty_file,
     configuration: conf_data,
+    build_subdir: 'usr_libexec_vtty/',
     install_dir: get_option('prefix') / get_option('libexecdir') / 'vtty',
   )
 endforeach
@@ -298,10 +303,10 @@ install_data(
 
 if initramfs_tools.enabled()
   configure_file(
-    #TODO rename to usr/share/initramfs-tools/hooks/recinit.in when Meson 1.10.0 is out for build_subdir
-    input: 'usr/share/initramfs-tools/hooks/recinit-hook.in',
-    output: 'recinit-hook',
+    input: 'usr/share/initramfs-tools/hooks/recinit.in',
+    output: 'recinit',
     configuration: conf_data,
+    build_subdir: 'usr_share_initramfs-tools_hooks',
     install_dir: initramfstoolsdir / 'hooks',
   )
 
@@ -309,6 +314,7 @@ if initramfs_tools.enabled()
     input: 'usr/share/initramfs-tools/scripts/override/panic.in',
     output: 'panic',
     configuration: conf_data,
+    build_subdir: 'usr/share/initramfs-tools/scripts/override/',
     install_dir: initramfstoolsdir / 'scripts/override',
   )
 endif
@@ -320,10 +326,10 @@ if mkinitcpio.enabled()
   )
 
   configure_file(
-    #TODO rename to usr/lib/initcpio/install/recinit.in when Meson 1.10.0 is out for build_subdir
-    input: 'usr/lib/initcpio/install/initcpio-recinit.in',
-    output: 'initcpio-recinit',
+    input: 'usr/lib/initcpio/install/recinit.in',
+    output: 'recinit',
     configuration: conf_data,
+    build_subdir: 'usr_lib_initcpio/install/',
     install_dir: mkinitcpiodir / 'install',
   )
 endif
@@ -332,6 +338,7 @@ configure_file(
   input: 'usr/share/wayland-sessions/fullscreenterminal.desktop.in',
   output: 'fullscreenterminal.desktop',
   configuration: conf_data,
+  build_subdir: 'usr_share_wayland-sessions/',
   install_dir: waylandsessionsdir,
 )
 
