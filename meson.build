@@ -1,6 +1,6 @@
 project(
   'fakekmscon',
-  version: '0.0.0',
+  version: '0000-00-00',
   meson_version: '>= 1.10.0',  # for build_subdir
   license: 'GPLv2+',
   license_files: 'COPYING.txt',
