@@ -223,6 +223,30 @@ foreach service_file : service_files
   )
 endforeach
 
+
+systemd_target_links = [
+  {
+    'target': 'emergency.target.wants',
+    'services': [ 'recinit-emergency' ],
+  },
+  {
+    'target': 'rescue.target.wants',
+    'services': [ 'recinit-rescue' ],
+  },
+]
+
+# From Plymouth's systemd-units/meson.build
+#Install the emergency/rescue service .wants files
+foreach entry : systemd_target_links
+  foreach service : entry['services']
+    install_symlink(
+      service + '.service',
+      install_dir: systemdsystemunitdir / entry['target'],
+      pointing_to: '..' / service + '.service',
+    )
+  endforeach
+endforeach
+
 install_data(
   'usr/lib/sysusers.d/vtty.conf',
   install_dir: sysusersdir,
