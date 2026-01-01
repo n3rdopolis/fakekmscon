@@ -121,10 +121,10 @@ then
   fi
 fi
 
-if [ -e @sysconfdir@/footkiosk.conf ]
+if [ -e "@sysconfdir@/vtty" ]
 then
-  mkdir -p "${DESTDIR}/@sysconfdir@"
-  cp -Z @sysconfdir@/footkiosk.conf "${DESTDIR}/@sysconfdir@"
+  mkdir -p "${DESTDIR}/@sysconfdir@/vtty"
+  cp -a "@sysconfdir@/vtty"/* "${DESTDIR}/@sysconfdir@/vtty"
 fi
 
 echo ". /scripts/override/panic" >> "${DESTDIR}/scripts/functions"

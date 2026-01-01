@@ -102,9 +102,10 @@ install() {
         fi
     fi
 
-    if [ -e @sysconfdir@/footkiosk.conf ]
+    if [ -e "@sysconfdir@/vtty" ]
     then
-        inst_simple @sysconfdir@/footkiosk.conf
+        mkdir -p "$initdir/@sysconfdir@/vtty"
+        cp -a "@sysconfdir@/vtty/"* "$initdir/@sysconfdir@/vtty"
     fi
 
     inst_simple @systemdsystemunitdir@/recinit-emergency.service

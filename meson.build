@@ -343,8 +343,8 @@ configure_file(
 )
 
 install_data(
-  'etc/footkiosk.conf',
-  install_dir: get_option('sysconfdir'),
+  'etc/vtty/footkiosk.conf',
+  install_dir: get_option('sysconfdir') / vtty,
 )
 
 if pam

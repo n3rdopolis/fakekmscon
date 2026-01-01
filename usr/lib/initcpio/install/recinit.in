@@ -82,9 +82,9 @@ build() {
         fi
     fi
 
-    if [ -e @sysconfdir@/footkiosk.conf ]
+    if [ -e @sysconfdir@/vtty ]
     then
-        add_file @sysconfdir@/footkiosk.conf
+        add_full_dir @sysconfdir@/vtty
     fi
 
     if declare -F add_systemd_unit &> /dev/null

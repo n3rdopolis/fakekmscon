@@ -22,7 +22,7 @@ UvTTYs and vTTYs here are very similar. They are both full screen foot terminals
 vTTYs run as a system user. UvTTYs run as the user, and are started by the display manager, as they register under /usr/share/wayland-sessions. 
 They both utilize socat client/servers but to solve different issues.
 
-In vTTYs /etc/footkiosk.conf is passed to be used as foot's config file. It configures the foot terminal to disable features that are not suitable for it running as a different user, for example URL parsing.
+In vTTYs /etc/vtty/footkiosk.conf is passed to be used as foot's config file. It configures the foot terminal to disable features that are not suitable for it running as a different user, for example URL parsing.
 
 In vTTYs a fake seat is used `seat-vtty` and the text mode user sessions are started on these fake seats. This is a logind workaround, It allows full PAM functionality to work, so that privleges work in tools that don't have to run as root, such as nmtui, or udisks.
 Otherwise, the session would have to start on the same seat, which would cause issues when the session starts and becomes active. The session for the host display server needs to be active for the display server to work.
