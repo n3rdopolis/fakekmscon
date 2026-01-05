@@ -46,3 +46,4 @@ Requirements:
     wl-clipboard    (for vTTYs to be able to clear the clipboard upon the next prompt for user log in)
     socat
     libnet-dbus-perl
+    wlr-randr       (for setting the cage multi-outputs to not extend)
