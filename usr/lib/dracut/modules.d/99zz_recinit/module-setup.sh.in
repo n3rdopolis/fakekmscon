@@ -17,84 +17,96 @@ depends() {
 
 # called by dracut
 install() {
-    inst_simple @bindir@/recinit /usr/bin/recinit
-    inst_multiple cage foot id
+    if [ -z "$LOCALE_LIB_DIR" ]
+    then
+        LOCALE_LIB_DIR=/usr/lib/locale
+    fi
+
+    if [ -z "$LIBINPUT_SHARE_DIR" ]
+    then
+        LIBINPUT_SHARE_DIR=/usr/share/libinput
+    fi
+
+    if [ -z "$LIBX11_SHARE_DIR" ]
+    then
+        LIBX11_SHARE_DIR=/usr/share/X11
+    fi
+
+    inst_simple "@bindir@/recinit" /usr/bin/recinit
+    inst_multiple cage foot id wlr-randr tput
     instmods evdev
 
     inst_rules 60-input-id.rules
 
-    #Workaround for older versions of Cage
-    inst_simple "/bin/true" "/usr/bin/Xwayland"
-
     MonospaceFontPath=$(fc-match -f %{file} monospace)
-    if [ -n $MonospaceFontPath ]
+    if [ -n "$MonospaceFontPath" ]
     then
-      inst_simple "$MonospaceFontPath" 
+        inst_simple "$MonospaceFontPath" 
     fi
 
     BoldMonospaceFontPath=$(fc-match -f %{file} monospace:weight=bold)
-    if [ -n $BoldMonospaceFont ]
+    if [ -n "$BoldMonospaceFontPath" ]
     then
         inst_simple "$BoldMonospaceFontPath"
     fi
 
-    if [ -e /usr/lib/locale/[cC].[uU][tT][fF]*8/ ]
+    if [ -e "$LOCALE_LIB_DIR"/[cC].[uU][tT][fF]*8/ ]
     then
-        CUTF8DIR=$(basename $(ls -d /usr/lib/locale/[cC].[uU][tT][fF]*8))
-        find /usr/lib/locale/$CUTF8DIR ! -type d | while read -r file
+        CUTF8DIR=$(basename $(ls -d "$LOCALE_LIB_DIR"/[cC].[uU][tT][fF]*8))
+        find "$LOCALE_LIB_DIR/$CUTF8DIR" ! -type d | while read -r file
         do
             inst_simple "$file"
         done
     fi
 
-    if [ -e /usr/share/libinput ]
+    if [ -e "$LIBINPUT_SHARE_DIR" ]
     then
-        find /usr/share/libinput ! -type d | while read -r file
+        find "$LIBINPUT_SHARE_DIR" ! -type d | while read -r file
         do
             inst_simple "$file"
         done
     fi
 
-    if [ -e /usr/share/X11/xkb ]
+    if [ -e "$LIBX11_SHARE_DIR/xkb" ]
     then
-        inst_simple /usr/share/X11/xkb/compat/accessx
-        inst_simple /usr/share/X11/xkb/compat/basic
-        inst_simple /usr/share/X11/xkb/compat/caps
-        inst_simple /usr/share/X11/xkb/compat/complete
-        inst_simple /usr/share/X11/xkb/compat/iso9995
-        inst_simple /usr/share/X11/xkb/compat/ledcaps
-        inst_simple /usr/share/X11/xkb/compat/lednum
-        inst_simple /usr/share/X11/xkb/compat/ledscroll
-        inst_simple /usr/share/X11/xkb/compat/level5
-        inst_simple /usr/share/X11/xkb/compat/misc
-        inst_simple /usr/share/X11/xkb/compat/mousekeys
-        inst_simple /usr/share/X11/xkb/compat/xfree86
-        inst_simple /usr/share/X11/xkb/keycodes/aliases
-        inst_simple /usr/share/X11/xkb/keycodes/evdev
-        inst_simple /usr/share/X11/xkb/rules/evdev
-        find /usr/share/X11/xkb/symbols -maxdepth 1 ! -type d | while read -r file
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/accessx"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/basic"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/caps"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/complete"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/iso9995"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/ledcaps"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/lednum"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/ledscroll"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/level5"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/misc"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/mousekeys"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/compat/xfree86"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/keycodes/aliases"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/keycodes/evdev"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/rules/evdev"
+        find "$LIBX11_SHARE_DIR/xkb/symbols" -maxdepth 1 ! -type d | while read -r file
         do
             inst_simple "$file"
         done
-        inst_simple /usr/share/X11/xkb/types/basic
-        inst_simple /usr/share/X11/xkb/types/complete
-        inst_simple /usr/share/X11/xkb/types/extra
-        inst_simple /usr/share/X11/xkb/types/iso9995
-        inst_simple /usr/share/X11/xkb/types/level5
-        inst_simple /usr/share/X11/xkb/types/mousekeys
-        inst_simple /usr/share/X11/xkb/types/numpad
-        inst_simple /usr/share/X11/xkb/types/pc
+        inst_simple "$LIBX11_SHARE_DIR/xkb/types/basic"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/types/complete"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/types/extra"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/types/iso9995"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/types/level5"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/types/mousekeys"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/types/numpad"
+        inst_simple "$LIBX11_SHARE_DIR/xkb/types/pc"
     fi
 
-    if [ -e /usr/share/X11/locale ]
+    if [ -e "$LIBX11_SHARE_DIR/locale" ]
     then
         # In the off chance the user uses their compose key in initrd
-        if [ -f "/usr/share/X11/locale/compose.dir" ]
+        if [ -f "$LIBX11_SHARE_DIR/locale/compose.dir" ]
         then
-            inst_simple /usr/share/X11/locale/compose.dir
-            grep UTF-8/Compose: /usr/share/X11/locale/compose.dir | awk -F: '{ print $1 }' | sort -u | xargs dirname | while read -r DIR
+            inst_simple "$LIBX11_SHARE_DIR/locale/compose.dir"
+            grep UTF-8/Compose: "$LIBX11_SHARE_DIR/locale/compose.dir" | awk -F: '{ print $1 }' | sort -u | xargs dirname | while read -r DIR
             do
-                find /usr/share/X11/locale/$DIR -maxdepth 1 ! -type d | while read -r file
+                find "$LIBX11_SHARE_DIR/locale/$DIR" -maxdepth 1 ! -type d | while read -r file
                 do
                     inst_simple "$file"
                 done
@@ -108,12 +120,12 @@ install() {
         cp -a "@sysconfdir@/vtty/"* "$initdir/@sysconfdir@/vtty"
     fi
 
-    inst_simple @systemdsystemunitdir@/recinit-emergency.service
-    inst_simple @systemdsystemunitdir@/emergency.target.wants/recinit-emergency.service
-    inst_simple @systemdsystemunitdir@/recinit-rescue.service
-    inst_simple @systemdsystemunitdir@/rescue.target.service/recinit-rescue.service
+    inst_simple "@systemdsystemunitdir@/recinit-emergency.service"
+    inst_simple "@systemdsystemunitdir@/emergency.target.wants/recinit-emergency.service"
+    inst_simple "@systemdsystemunitdir@/recinit-rescue.service"
+    inst_simple "@systemdsystemunitdir@/rescue.target.service/recinit-rescue.service"
 
-    inst_simple "$moddir/recinit-dracut-emergency" /usr/bin/recinit-dracut-emergency
+    inst_simple "$moddir/recinit-dracut-emergency" "/usr/bin/recinit-dracut-emergency"
     inst_simple "$moddir/dracut-lib-recinit-shell.sh" "/lib/dracut-lib-recinit-shell.sh"
-    echo ". /lib/dracut-lib-recinit-shell.sh" >> $initdir/lib/dracut-lib.sh
+    echo ". /lib/dracut-lib-recinit-shell.sh" >> "$initdir/lib/dracut-lib.sh"
 }

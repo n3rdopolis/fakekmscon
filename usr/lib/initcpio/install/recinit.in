@@ -1,80 +1,95 @@
 #!/usr/bin/bash
 
 build() {
+
+    if [ -z "$LOCALE_LIB_DIR" ]
+    then
+        LOCALE_LIB_DIR=/usr/lib/locale
+    fi
+
+    if [ -z "$LIBINPUT_SHARE_DIR" ]
+    then
+        LIBINPUT_SHARE_DIR=/usr/share/libinput
+    fi
+
+    if [ -z "$LIBX11_SHARE_DIR" ]
+    then
+        LIBX11_SHARE_DIR=/usr/share/X11
+    fi
+
     add_binary cage
     add_binary foot
-    add_file @bindir@/recinit /usr/bin/recinit
+    add_binary wlr-randr
+    add_file "@bindir@/recinit" /usr/bin/recinit
     add_binary id
+    add_binary tput
 
     add_module evdev
     add_udev_rule /lib/udev/rules.d/60-input-id.rules
 
-    #Workaround for older versions of Cage
-    add_binary /bin/true /usr/bin/Xwayland
-
     MonospaceFontPath=$(fc-match -f %{file} monospace)
-    if [ -n $MonospaceFontPath ]
+    if [ -n "$MonospaceFontPath" ]
     then
         add_file "$MonospaceFontPath"
     fi
 
     BoldMonospaceFontPath=$(fc-match -f %{file} monospace:weight=bold)
-    if [ -n $BoldMonospaceFont ]
+    if [ -n "$BoldMonospaceFontPath" ]
     then
         add_file "$BoldMonospaceFontPath"
     fi
 
-    if [ -e /usr/lib/locale/[cC].[uU][tT][fF]*8/ ]
+    if [ -e $LOCALE_LIB_DIR/[cC].[uU][tT][fF]*8/ ]
     then
-        CUTF8DIR=$(basename $(ls -d /usr/lib/locale/[cC].[uU][tT][fF]*8))
-        add_full_dir /usr/lib/locale/$CTUF8DIR
+        CUTF8DIR=$(basename $(ls -d "$LOCALE_LIB_DIR"/[cC].[uU][tT][fF]*8))
+        add_full_dir "$LOCALE_LIB_DIR/$CTUF8DIR"
     fi
 
-    if [ -e /usr/share/libinput ]
+    if [ -e "$LIBINPUT_SHARE_DIR" ]
     then
-        add_full_dir /usr/share/libinput
+        add_full_dir "$LIBINPUT_SHARE_DIR"
     fi
 
-    if [ -e /usr/share/X11/xkb ]
+    if [ -e "$LIBX11_SHARE_DIR/xkb" ]
     then
-        add_file /usr/share/X11/xkb/compat/accessx
-        add_file /usr/share/X11/xkb/compat/basic
-        add_file /usr/share/X11/xkb/compat/caps
-        add_file /usr/share/X11/xkb/compat/complete
-        add_file /usr/share/X11/xkb/compat/iso9995
-        add_file /usr/share/X11/xkb/compat/ledcaps
-        add_file /usr/share/X11/xkb/compat/lednum
-        add_file /usr/share/X11/xkb/compat/ledscroll
-        add_file /usr/share/X11/xkb/compat/level5
-        add_file /usr/share/X11/xkb/compat/misc
-        add_file /usr/share/X11/xkb/compat/mousekeys
-        add_file /usr/share/X11/xkb/compat/xfree86
-        add_file /usr/share/X11/xkb/keycodes/aliases
-        add_file /usr/share/X11/xkb/keycodes/evdev
-        add_file /usr/share/X11/xkb/rules/evdev
-        find /usr/share/X11/xkb/symbols -maxdepth 1 ! -type d | while read -r file
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/accessx"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/basic"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/caps"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/complete"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/iso9995"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/ledcaps"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/lednum"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/ledscroll"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/level5"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/misc"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/mousekeys"
+        add_file "$LIBX11_SHARE_DIR/xkb/compat/xfree86"
+        add_file "$LIBX11_SHARE_DIR/xkb/keycodes/aliases"
+        add_file "$LIBX11_SHARE_DIR/xkb/keycodes/evdev"
+        add_file "$LIBX11_SHARE_DIR/xkb/rules/evdev"
+        find "$LIBX11_SHARE_DIR/xkb/symbols" -maxdepth 1 ! -type d | while read -r file
         do
             add_file "$file"
         done
-        add_file /usr/share/X11/xkb/types/basic
-        add_file /usr/share/X11/xkb/types/complete
-        add_file /usr/share/X11/xkb/types/extra
-        add_file /usr/share/X11/xkb/types/iso9995
-        add_file /usr/share/X11/xkb/types/level5
-        add_file /usr/share/X11/xkb/types/mousekeys
-        add_file /usr/share/X11/xkb/types/numpad
-        add_file /usr/share/X11/xkb/types/pc
+        add_file "$LIBX11_SHARE_DIR/xkb/types/basic"
+        add_file "$LIBX11_SHARE_DIR/xkb/types/complete"
+        add_file "$LIBX11_SHARE_DIR/xkb/types/extra"
+        add_file "$LIBX11_SHARE_DIR/xkb/types/iso9995"
+        add_file "$LIBX11_SHARE_DIR/xkb/types/level5"
+        add_file "$LIBX11_SHARE_DIR/xkb/types/mousekeys"
+        add_file "$LIBX11_SHARE_DIR/xkb/types/numpad"
+        add_file "$LIBX11_SHARE_DIR/xkb/types/pc"
     fi
 
-    if [ -e /usr/share/X11/locale ]
+    if [ -e "$LIBX11_SHARE_DIR/locale" ]
     then
         # In the off chance the user uses their compose key in initrd
-        if [ -f "/usr/share/X11/locale/compose.dir" ]
+        if [ -f "$LIBX11_SHARE_DIR/locale/compose.dir" ]
         then
-            add_file /usr/share/X11/locale/compose.dir
-            grep UTF-8/Compose: /usr/share/X11/locale/compose.dir | awk -F: '{ print $1 }' | sort -u | xargs dirname | while read -r DIR
+            add_file "$LIBX11_SHARE_DIR/locale/compose.dir"
+            grep UTF-8/Compose: "$LIBX11_SHARE_DIR/locale/compose.dir" | awk -F: '{ print $1 }' | sort -u | xargs dirname | while read -r DIR
             do
-                find /usr/share/X11/locale/$DIR -maxdepth 1 ! -type d | while read -r file
+                find "$LIBX11_SHARE_DIR/locale/$DIR" -maxdepth 1 ! -type d | while read -r file
                 do
                     add_file "$file"
                 done
@@ -82,9 +97,9 @@ build() {
         fi
     fi
 
-    if [ -e @sysconfdir@/vtty ]
+    if [ -e "@sysconfdir@/vtty" ]
     then
-        add_full_dir @sysconfdir@/vtty
+        add_full_dir "@sysconfdir@/vtty"
     fi
 
     if declare -F add_systemd_unit &> /dev/null
@@ -92,8 +107,8 @@ build() {
         add_systemd_unit recinit-emergency.service
     fi
 
-    add_file @mkinitcpiodir@/override/init_functions_override /init_functions_override
-    echo ". /init_functions_override" >> $BUILDROOT/init_functions
+    add_file "@mkinitcpiodir@/override/init_functions_override" "/init_functions_override"
+    echo ". /init_functions_override" >> "$BUILDROOT/init_functions"
 }
 
 help() {
