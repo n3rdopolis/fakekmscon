@@ -79,3 +79,10 @@ option(
   type: 'string',
   description: 'PAM configuration directory',
 )
+
+option(
+  'cagebinaryname',
+  type: 'string',
+  value: 'cage',
+  description: 'Name of the cage binary. Usually it is "cage", but some distributions might want to make a "cage-minimal" or something that links against a build of wlroots with no gl/vulkan renderers for smaller initrds.',
+)

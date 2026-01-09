@@ -92,7 +92,7 @@ function vTTYFrontendMain
     exit 1
   fi
 
-  which cage &> /dev/null
+  which @cagebinaryname@ &> /dev/null
   if [[ $? != 0 ]]
   then
     echo "cage not installed"
@@ -172,7 +172,7 @@ function vTTYFrontendMain
   export LIBGL_ALWAYS_SOFTWARE=1
   export DBUS_SESSION_BUS_ADDRESS=/dev/null
   export XDG_CONFIG_HOME="@sysconfdir@/vtty"
-  cage -d -s -- \
+  @cagebinaryname@ -d -s -- \
   foot --config=$XDG_CONFIG_HOME/footkiosk.conf -- \
   @libexecdir@/vtty/vtty-fe-connect $EmulatedTTY &> /run/vtty/$EmulatedTTY/host.log &
   CAGEPID=$!

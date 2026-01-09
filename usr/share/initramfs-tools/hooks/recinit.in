@@ -30,7 +30,7 @@ then
   LIBX11_SHARE_DIR=/usr/share/X11
 fi
 
-copy_exec "$(which cage)" /usr/bin/
+copy_exec "$(which @cagebinaryname@)" /usr/bin/
 copy_exec "$(which foot)" /usr/bin/
 copy_exec "$(which id)" /usr/bin/
 copy_exec "$(which wlr-randr)" /usr/bin/

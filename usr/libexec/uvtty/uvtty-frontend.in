@@ -86,7 +86,7 @@ function UvTTYFrontendMain
     #Workaround for https://gitlab.freedesktop.org/wlroots/wlroots/-/issues/4040
     export WLR_DRM_DEVICES=$(GetFirstSeatCard)
 
-    cage -d -s -- \
+    @cagebinaryname@ -d -s -- \
     foot --font DejaVuSansMono:size=9 -- \
     @libexecdir@/uvtty/uvtty-fe-connect $UvTTYName &
     CAGEPID=$!

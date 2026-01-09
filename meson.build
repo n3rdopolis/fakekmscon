@@ -10,6 +10,7 @@ conf_data = configuration_data()
 conf_data.set('bindir', get_option('prefix') / get_option('bindir'))
 conf_data.set('libexecdir', get_option('prefix') / get_option('libexecdir'))
 conf_data.set('sysconfdir', get_option('prefix') / get_option('sysconfdir'))
+conf_data.set('cagebinaryname', get_option('cagebinaryname'))
 
 bashcompletiondir = get_option('bashcompletiondir')
 if bashcompletiondir == ''
