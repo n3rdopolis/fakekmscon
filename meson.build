@@ -348,6 +348,11 @@ install_data(
   install_dir: get_option('sysconfdir') / 'vtty',
 )
 
+install_data(
+  'etc/vtty/kanshiconfig.conf',
+  install_dir: get_option('sysconfdir') / 'vtty',
+)
+
 if pam
   install_data(
     'etc/pam.d/vtty',

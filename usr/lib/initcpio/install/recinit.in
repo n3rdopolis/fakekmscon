@@ -19,7 +19,7 @@ build() {
 
     add_binary @cagebinaryname@
     add_binary foot
-    add_binary wlr-randr
+    add_binary kanshi
     add_file "@bindir@/recinit" /usr/bin/recinit
     add_binary id
     add_binary tput

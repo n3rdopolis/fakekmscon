@@ -33,7 +33,7 @@ install() {
     fi
 
     inst_simple "@bindir@/recinit" /usr/bin/recinit
-    inst_multiple @cagebinaryname@ foot id wlr-randr tput
+    inst_multiple @cagebinaryname@ foot id kanshi tput
     instmods evdev
 
     inst_rules 60-input-id.rules
