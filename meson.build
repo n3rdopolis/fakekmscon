@@ -183,7 +183,7 @@ foreach bin_file : bin_files
     input: 'usr/bin' / bin_file + '.in',
     output: bin_file,
     configuration: conf_data,
-    build_subdir: 'usr_bin/',
+    build_subdir: 'usr_bin',
     install_dir: get_option('prefix') / get_option('bindir'),
   )
 endforeach
@@ -200,7 +200,7 @@ if dracut.enabled()
       input: 'usr/lib/dracut/modules.d/99zz_recinit' / dracut_file + '.in',
       output: dracut_file,
       configuration: conf_data,
-      build_subdir: 'usr_lib_dracut_modules.d_99zz_recinit/',
+      build_subdir: 'usr_lib_dracut_modules.d_99zz_recinit',
       # Dracut won't look elsewhere for modules
       install_dir: dracutmodulesdir / '99zz_recinit',
     )
@@ -274,7 +274,7 @@ foreach uvtty_file : uvtty_files
     input: 'usr/libexec/uvtty' / uvtty_file + '.in',
     output: uvtty_file,
     configuration: conf_data,
-    build_subdir: 'usr_libexec_uvtty/',
+    build_subdir: 'usr_libexec_uvtty',
     install_dir: get_option('prefix') / get_option('libexecdir') / 'uvtty',
   )
 endforeach
@@ -292,7 +292,7 @@ foreach vtty_file : vtty_files
     input: 'usr/libexec/vtty' / vtty_file + '.in',
     output: vtty_file,
     configuration: conf_data,
-    build_subdir: 'usr_libexec_vtty/',
+    build_subdir: 'usr_libexec_vtty',
     install_dir: get_option('prefix') / get_option('libexecdir') / 'vtty',
   )
 endforeach
@@ -315,7 +315,7 @@ if initramfs_tools.enabled()
     input: 'usr/share/initramfs-tools/scripts/override/panic.in',
     output: 'panic',
     configuration: conf_data,
-    build_subdir: 'usr/share/initramfs-tools/scripts/override/',
+    build_subdir: 'usr_share_initramfs-tools_scripts_override',
     install_dir: initramfstoolsdir / 'scripts/override',
   )
 endif
@@ -330,7 +330,7 @@ if mkinitcpio.enabled()
     input: 'usr/lib/initcpio/install/recinit.in',
     output: 'recinit',
     configuration: conf_data,
-    build_subdir: 'usr_lib_initcpio/install/',
+    build_subdir: 'usr_lib_initcpio_install',
     install_dir: mkinitcpiodir / 'install',
   )
 endif
@@ -339,7 +339,7 @@ configure_file(
   input: 'usr/share/wayland-sessions/fullscreenterminal.desktop.in',
   output: 'fullscreenterminal.desktop',
   configuration: conf_data,
-  build_subdir: 'usr_share_wayland-sessions/',
+  build_subdir: 'usr_share_wayland-sessions',
   install_dir: waylandsessionsdir,
 )
 
