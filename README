@@ -7,11 +7,6 @@ vTTY:
 
 The backend process looks for a /usr/bin/vtty-login-program symlink, where for example, it can be replaced with console-conf https://ubuntu.com/core/docs/system-user or something similar.
 
-As systemd is only able to start one instance of vtty-frontend-novt@.service without help (as only seat0 is able to be hardcoded), and only one instance, as it only supports one parameter, this is only fit for servers that are headless 99% of the time except for initial config, or emergency view of the console with VM manager, or KVM manager.
-
-
-Minimal Desktops are much better off using a minimal login manager, something similar to this https://www.youtube.com/watch?v=grKc8M83q4s .
-
 
 UvTTY:
 /usr/share/wayland-sessions/fullscreenterminal.desktop is a "wayland session" which is just the user's $SHELL running under the foot terminal running under the cage display server, it is just a full screen terminal emulator, and a very minimal session
