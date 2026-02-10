@@ -176,7 +176,7 @@ if pam
 endif
 conf_data.set('pamconfdir', pamconfdir)
 
-bin_files = ['recinit', 'uvtty-launch', 'vtty-toggle']
+bin_files = ['recinit', 'uvtty-launch']
 
 foreach bin_file : bin_files
   configure_file(
