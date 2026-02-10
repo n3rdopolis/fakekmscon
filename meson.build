@@ -355,7 +355,7 @@ install_data(
 
 if pam
   install_data(
-    'etc/pam.d/vtty',
+    'etc/pam.d/vtty-frontend',
     install_dir: pamconfdir,
   )
 endif
