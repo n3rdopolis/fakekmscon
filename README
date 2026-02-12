@@ -1,5 +1,8 @@
 This contains multiple solutions to replacing what goes missing without VTs
 
+vtty-seatmanager:
+This acts as a minimal 'display manager' for systems without a desktop environment
+It starts vtty frontends on all seats.
 
 vTTY:
 /usr/lib/systemd/system/vtty-frontend-novt@.service and /usr/lib/systemd/system/vtty-backend-novt@.service take a seat as the parameter parameter. Only seat0 starts by default.
@@ -7,6 +10,7 @@ vTTY:
 
 The backend process looks for a /usr/bin/vtty-login-program symlink, where for example, it can be replaced with console-conf https://ubuntu.com/core/docs/system-user or something similar.
 
+Users who are logged into a vtty session can use vtty-launch to start display servers such as Weston if desired.
 
 UvTTY:
 /usr/share/wayland-sessions/fullscreenterminal.desktop is a "wayland session" which is just the user's $SHELL running under the foot terminal running under the cage display server, it is just a full screen terminal emulator, and a very minimal session
