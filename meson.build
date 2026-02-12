@@ -176,7 +176,7 @@ if pam
 endif
 conf_data.set('pamconfdir', pamconfdir)
 
-bin_files = ['recinit', 'uvtty-launch']
+bin_files = ['recinit', 'vtty-launch', 'uvtty-launch']
 
 foreach bin_file : bin_files
   configure_file(
@@ -298,6 +298,11 @@ foreach vtty_file : vtty_files
 endforeach
 
 install_data(
+  'usr/share/bash-completion/completions/vtty-launch',
+  install_dir: bashcompletiondir,
+)
+
+install_data(
   'usr/share/bash-completion/completions/uvtty-launch',
   install_dir: bashcompletiondir,
 )
@@ -358,4 +363,17 @@ if pam
     'etc/pam.d/vtty-frontend',
     install_dir: pamconfdir,
   )
+
+  install_data(
+    'etc/pam.d/vtty-launch',
+    install_dir: pamconfdir,
+  )
 endif
+
+configure_file(
+  input: 'usr/share/polkit-1/rules.d/vtty-launch.rules.in',
+  output: 'vtty-launch.rules',
+  configuration: conf_data,
+  build_subdir: 'usr_share_polkit-1_rules.d',
+  install_dir: get_option('prefix') / get_option('datadir') / 'polkit-1/rules.d',
+)
