@@ -83,12 +83,6 @@ RecinitMain()
   export WLR_RENDERER=pixman
   export XDG_CONFIG_HOME=/etc/vtty
 
-  if [ $1 = "--HandleResize" ]
-  then
-    RecinitHandleResize > /dev/null 2>&1
-    exit
-  fi
-
   #Ensure that /dev/pts is mounted
   if ! mountpoint /dev/pts > /dev/null 2>&1
   then
