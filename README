@@ -4,6 +4,17 @@ vtty-seatmanager:
 This acts as a minimal 'display manager' for systems without a desktop environment
 It starts vtty frontends on all seats.
 
+It starts up to NAutoVTs (configured in logind) instances on a seat
+Usually this defaults to up to 6. for seat0, it's
+vtty-frontend-seat@seat0@vtty1.service - vtty-frontend-seat@seat0@vtty6.service
+
+Upon start, it only starts the first instance on the seat.
+If a user is logged into the first session, pressing Ctrl+Alt+Shift+Esc (logind's SecureAttentionKey), it starts the second instance on the seat
+If the user logs off the first one on the seat, pressing Ctrl+Alt+Shift+Esc, makes it find the first instance.
+
+When out of free NAutoVTs, further presses of Ctrl+Alt+Shift+Esc cycles through running sessions
+Because of the way logind works, Ctrl+Alt+F(x) WORKS even without VTs too with most display servers, including Cage.
+
 vTTY:
 /usr/lib/systemd/system/vtty-frontend-novt@.service and /usr/lib/systemd/system/vtty-backend-novt@.service take a seat as the parameter parameter. Only seat0 starts by default.
 (Unlike vtty-frontend@.service and vtty-backend@.service can replace autovt@.service, they take a tty as the parameter, for systems that still have VTs, it can give a nice looking console, but users need to be in sudoers to be able to run commands like `startx` )
