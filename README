@@ -13,7 +13,11 @@ If a user is logged into the first session, pressing Ctrl+Alt+Shift+Esc (logind'
 If the user logs off the first one on the seat, pressing Ctrl+Alt+Shift+Esc, makes it find the first instance.
 
 When out of free NAutoVTs, further presses of Ctrl+Alt+Shift+Esc cycles through running sessions
-Because of the way logind works, Ctrl+Alt+F(x) WORKS even without VTs too with most display servers, including Cage.
+
+Pretty much most display servers can handle Ctrl+Alt+F(x) already as well, even without VTs
+They do this because they call the SwitchTo method on the seat's dbus object.
+SwitchTo(1) on a seat with VTs changes to VT1, but SwitchTo(1) on a seat without VTs switches to the first seat on the index.
+
 
 vTTY:
 /usr/lib/systemd/system/vtty-frontend-novt@.service and /usr/lib/systemd/system/vtty-backend-novt@.service take a seat as the parameter parameter. Only seat0 starts by default.
