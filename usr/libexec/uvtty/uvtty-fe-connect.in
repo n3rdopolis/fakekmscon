@@ -93,22 +93,25 @@ function UvTTYFeConnectMain
   fi
 
   XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR/uvtty/$UvTTYName WAYLAND_DISPLAY=waylandserver kanshi -c "$KANSHI_CONFIG_FILE" &>/dev/null &
+  KANSHIPID=$!
 
   socat file:$PTYPath,raw,echo=0 unix-connect:"$XDG_RUNTIME_DIR/uvtty/$UvTTYName/socatproxy" &
   SOCATPID=$!
 
-  trap 'if [[ ! -e /proc/$SOCATPID ]]; then exit; fi' SIGCHLD
+  trap 'if [[ ! -e /proc/$SOCATPID ]]; then kill -9 $KANSHIPID; exit; fi' SIGCHLD
   PtyResizeEvent
 
   while [ 1 ]
   do
     wait $SOCATPID
     if [[ ! -e /proc/$SOCATPID ]]
-      then exit
+    then
+      exit
     fi
     $SLEEPCMD .1
   done
 
+  kill -9 $KANSHIPID
   exit
 }
 
