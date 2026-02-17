@@ -83,7 +83,7 @@ RecinitMain()
   export WLR_LIBINPUT_NO_DEVICES=1
   export WLR_NO_HARDWARE_CURSORS=1
   export WLR_RENDERER=pixman
-  export XDG_CONFIG_HOME=/etc/vtty
+  export XDG_CONFIG_HOME="@sysconfdir@/vtty"
 
   #Ensure that /dev/pts is mounted
   if [ ! -e /dev/pts/ptmx ]
