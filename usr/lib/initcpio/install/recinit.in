@@ -23,6 +23,7 @@ build() {
     add_file "@bindir@/recinit" /usr/bin/recinit
     add_binary id
     add_binary tput
+    add_binary pkill
 
     add_module evdev
     add_udev_rule /lib/udev/rules.d/60-input-id.rules
