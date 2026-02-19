@@ -1,68 +1,138 @@
-This contains multiple solutions to replacing what goes missing without VTs
+This project uses a wayland display server and a wayland based terminal emulator to bring a full screen terminal experiance in userspace, for kernels without VTs
 
-vtty-seatmanager:
-This acts as a minimal 'display manager' for systems without a desktop environment
-It starts vtty frontends on all seats.
+Instead of a terminal emulator being in kernel mode, the terminal emulators are in user space, and except for the recovery consoles, they run as a non-root user.
 
-It starts up to NAutoVTs (configured in logind) instances on a seat
-Usually this defaults to up to 6. for seat0, it's
-vtty-frontend-seat@seat0@vtty1.service - vtty-frontend-seat@seat0@vtty6.service
+============================================================================================================================
 
-Upon start, it only starts the first instance on the seat.
-If a user is logged into the first session, pressing Ctrl+Alt+Shift+Esc (logind's SecureAttentionKey), it starts the second instance on the seat
-If the user logs off the first one on the seat, pressing Ctrl+Alt+Shift+Esc, makes it find the first instance.
+There are several different components
+   1. recinit: Runs as root (for single-user mode, before logind starts, usually in an initrd that fails)
 
-When out of free NAutoVTs, further presses of Ctrl+Alt+Shift+Esc cycles through running sessions
+   2. UvTTY: Runs as the user, as a Wayland session
 
-Pretty much most display servers can handle Ctrl+Alt+F(x) already as well, even without VTs
-They do this because they call the SwitchTo method on the seat's dbus object.
-SwitchTo(1) on a seat with VTs changes to VT1, but SwitchTo(1) on a seat without VTs switches to the first seat on the index.
+   3. vTTY: Runs as a non-root user, presenting a login, that runs as a systemd service
+      There is the vtty-seatmanager service as well that can replace display-manager.service for systems without any other display managers, or display servers, or desktop environments.
 
 
-vTTY:
-/usr/lib/systemd/system/vtty-frontend-novt@.service and /usr/lib/systemd/system/vtty-backend-novt@.service take a seat as the parameter parameter. Only seat0 starts by default.
-(Unlike vtty-frontend@.service and vtty-backend@.service can replace autovt@.service, they take a tty as the parameter, for systems that still have VTs, it can give a nice looking console, but users need to be in sudoers to be able to run commands like `startx` )
+  Administrators on VT-enabled kernels can use vttys by running `ln -s /usr/lib/systemd/system/vtty-frontend@.service /etc/systemd/system/autovt@.service` to replace the default gettys.
+  Because of systemd parameters, the vtty-backend@.service and vtty-frontend@.service pair up with each other, and are for when seat0 is running on a kernel with VTs.
 
-The backend process looks for a /usr/bin/vtty-login-program symlink, where for example, it can be replaced with console-conf https://ubuntu.com/core/docs/system-user or something similar.
-
-Users who are logged into a vtty session can use vtty-launch to start display servers such as Weston if desired.
-
-UvTTY:
-
-/usr/share/wayland-sessions/fullscreenterminal.desktop is a "wayland session" which is just the user's $SHELL running under the foot terminal running under the cage display server, it is just a full screen terminal emulator, and a very minimal session
+  More of the focus now is for VT-less kernels these days, so this configuration is not maintained as much, but this can allow for testing without changing the kernel.
 
 
+vtty-backend-seat@.service and vtty-frontend-seat@.service are for VT-less seats, including seat0 when there are no VTs (A VT-less kernel)
+It takes the seat as the parameter. However the seat can be followed by a "@" with a comment, to allow a second instance on the seat.
 
-UvTTYs and vTTYs here are very similar. They are both full screen foot terminals 
-vTTYs run as a system user. UvTTYs run as the user, and are started by the display manager, as they register under /usr/share/wayland-sessions. 
-They both utilize socat client/servers but to solve different issues.
-
-In vTTYs /etc/vtty/footkiosk.conf is passed to be used as foot's config file. It configures the foot terminal to disable features that are not suitable for it running as a different user, for example URL parsing.
-
-
-UvTTY's use the same /etc/vtty/footkiosk.conf and /etc/vtty/kanshiconfig.conf
-Unless they exist in the user's .config/vtty/ 
-
-In vTTYs a fake seat is used `seat-vtty` and the text mode user sessions are started on these fake seats. This is a logind workaround, It allows full PAM functionality to work, so that privleges work in tools that don't have to run as root, such as nmtui, or udisks.
-Otherwise, the session would have to start on the same seat, which would cause issues when the session starts and becomes active. The session for the host display server needs to be active for the display server to work.
-
-In vTTYs the getty runs under a socat "server" that runs as root, and creates a pty terminal for these commands. It grants the vtty user access to it. The socat client runs under foot, which runs under cage, all of which run as the pty user. This prevents the need for a display server and a terminal emulator to run as root.
-
-In UvTTYs, there is a socat client/server but they both run as the same user. This is so that the cage display server can be stopped without stopping the user session.
-This is for uvtty-launch to work. `uvtty-launch startx` https://www.youtube.com/watch?v=qSJ3Fc77tRI could be a common command that is run. Or weston. Display server developers on systems without VTs would likely enjoy this feature.
+Enabling vtty-frontend-seat@seat0.service is possible, to allow a singular instance on seat0.
+Enabling vtty-frontend-seat@seat0@mysession1.service and vtty-frontend-seat@seat0@mysession2.service is also possible to allow 2 sessions on seat0.
 
 
+Using vtty-seatmanager.service is recommended though, instead of hardcoding that.
+It detects the running seats, and it starts sessions on them.
 
-/usr/bin/recinit
-recinit can be run as init=/bin/recinit instead of init=/bin/bash
-recinit can also add around 12MB of files (3MB compressed to the initrd) and it works to show the (initramfs) prompt when the early boot process fails
+============================================================================================================================
+recinit
 
-recinit starts /bin/init when the shell exits, it can be changed at runtime by editing /run/recinit/init
+  recinit only is recommended for kernels without VTs.
 
-Requirements:
-    cage
-    foot
-    wl-clipboard    (for vTTYs to be able to clear the clipboard upon the next prompt for user log in)
-    socat
-    libnet-dbus-perl
-    kanshi 1.9.0+    (for setting the cage multi-outputs to not extend)
+  recinit can be started as init=/bin/recinit in an emergency. When recinit is pid 1
+
+  It differs from init=/bin/bash in that when done, instead of running 'exec /sbin/init' instead, 'exit'-ing out makes it continue. and it runs 'exec /sbin/init' as soon as the terminal emulator quits.
+
+  To make it run a different command, replace '/run/recinit/init' with a different command.
+
+
+  recinit can also run in an initrd, usually to allow a console when the initrd fails to mount the root file system, to give the user a recovery console
+  
+  In testing, recinit can add around 12MB (pre-compressed file size) to the initrd.
+
+  Hooks for initramfs-tools, initcpio, and dracut are included
+
+============================================================================================================================
+
+vtty-seatmanager
+
+  This acts as a minimal 'display manager' for systems without a desktop environment
+  It starts vtty frontends on all seats.
+
+  It starts up to NAutoVTs (configured in logind) instances on a seat. logind typically defaults to 6.
+  logind can be changed to add more or less, using /etc/systemd/logind.conf .
+
+  For seat0, it will start at vtty-frontend-seat@seat0@vtty1.service
+  and by default, it will go up to vtty-frontend-seat@seat0@vtty6.service 
+
+  Upon start, it only starts the first instance on the seat.
+
+  It only starts a new instance if a user is logged into the first instance, *and then* logind emits the SecureAttentionKey dbus signal, presenting a login to the user for the second instance
+     (logind by default emits the signal when the user presses Ctrl+Alt+Shift+Esc)
+
+  If a user logs into the second instance, and then presses Ctrl+Alt+Shift+Esc, it starts the third instance on the seat. Provided that both instances are still in use.
+
+  If a user logs out of one of the instances, and Ctrl+Alt+Shift+Esc is pressed, it finds a free instance, allowing the user to log in
+
+  When NAutoVTs is hit (6 sessions by default), further presses of Ctrl+Alt+Shift+Esc cycles through running sessions.
+
+  To switch between sessions with less than 6, users can switch with Ctrl+Alt+F(x), just like switching with VTs. Most Display Servers handle this on seats without VTs.
+
+============================================================================================================================
+
+vTTY
+
+  The vttys are started by systemd. There are two components, the backend, and the frontend.
+
+  The backend runs a getty (or other command) under a socat instance. This allows the getty prompt to run as root without setuid.
+  It also allows the commands to be resillent if the frontend ever crashes, the user sessions remain running..
+
+  The frontend is the foot terminal emulator, running under the cage display server. The frontend runs as a non-root "vtty" user to protect the running system.
+  Under foot, it starts a socat client to connect to the backend's socket, allowing the pty to appear on the frontend.
+
+  The frontend traps the WINCH signal, the backend listends on a ptycommandproxy FIFO, and when the frontend terminal emulator size changes, it sets the PTY size of the backend.
+  This allows TUI applications, like nmtui to work correctly
+
+  Users who log in to vTTYs instead of starting under seat0, or a physical seat, start under the seat-vtty seat.
+  seat-vtty is created by 72-seat-vtty.rules that makes this fake seat. This allows users under vTTYs to have fully functional PAM sessions
+
+  For vTTYs, once logged in, users can use the 'vtty-launch' utility.
+
+  For example 'vtty-launch weston' starts Weston
+
+  vtty-launch allows commands like Weston or ffmpeg, or another display server to be run. vtty-launch suspends the frontend, and starts a session as the user, with the user's environment, on the same seat as the frontend.
+
+============================================================================================================================
+
+UvTTY
+
+  The principals are similar for UvTTY as it is for vTTY.
+
+  They are client-server like vTTYs, however the server and the client run as the same user, and the backend starts the user's $SHELL instead of a getty.
+
+
+  /usr/share/wayland-sessions/fullscreenterminal.desktop is a "wayland session" that when selected from under a full-featured login manager, starts a UvTTY session
+
+  This is for users who want to log into a full screen terminal experiance
+
+  Users who want to run or test or develop display servers, can use uvtty-launch, very similar to vtty-launch.
+
+============================================================================================================================
+
+Configuring
+
+  /usr/bin/vtty-login-program: This can be a symlink to any program, to make the vTTY sessions run a specific command instead of a getty.
+    Distributions might want to do this for a first-time run program, such as 'console-conf' or something similar.
+
+  /etc/vtty/footkiosk.conf: configures foot for the recinit, the vTTYs, and the user's UvTTYs
+    Users can provide thier own ~/.config/uvtty/footkiosk.conf to override the settings in thier UvTTY sessions
+
+  /etc/vtty/kanshiconfig.conf: This configures the kanshi daemon that enforces cage to be in clone mode.
+    This is applicable in recinit, vTTYs, and UvTTYs
+    Users can replace this with their own ~/.config/uvtty/kanshiconfig.conf, but this is less-likely to be needed.
+
+============================================================================================================================
+
+Requirements and dependencies
+
+  cage             (the display server)
+  foot             (the terminal emulator)
+  socat            (The client/server utility)
+  wl-clipboard     (for vTTYs to be able to clear the clipboard upon the next prompt for user log in)
+  kanshi 1.9.0+    (for setting the cage multi-outputs to clone mode)
+  libnet-dbus-perl (for vtty-seatmanager's interactions with dbus)
