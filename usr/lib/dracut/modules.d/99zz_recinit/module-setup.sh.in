@@ -32,6 +32,8 @@ install() {
         LIBX11_SHARE_DIR=/usr/share/X11
     fi
 
+    inst_simple /etc/vconsole.conf
+
     inst_simple "@bindir@/recinit" /usr/bin/recinit
     inst_multiple @cagebinaryname@ foot id kanshi tput pkill
     instmods evdev

@@ -19,15 +19,15 @@ There are several different components
   More of the focus now is for VT-less kernels these days, so this configuration is not maintained as much, but this can allow for testing without changing the kernel.
 
 
-vtty-backend-seat@.service and vtty-frontend-seat@.service are for VT-less seats, including seat0 when there are no VTs (A VT-less kernel)
-It takes the seat as the parameter. However the seat can be followed by a "@" with a comment, to allow a second instance on the seat.
+  vtty-backend-seat@.service and vtty-frontend-seat@.service are for VT-less seats, including seat0 when there are no VTs (A VT-less kernel)
+  It takes the seat as the parameter. However the seat can be followed by a "@" with a comment, to allow a second instance on the seat.
 
-Enabling vtty-frontend-seat@seat0.service is possible, to allow a singular instance on seat0.
-Enabling vtty-frontend-seat@seat0@mysession1.service and vtty-frontend-seat@seat0@mysession2.service is also possible to allow 2 sessions on seat0.
+  Enabling vtty-frontend-seat@seat0.service is possible, to allow a singular instance on seat0.
+  Enabling vtty-frontend-seat@seat0@mysession1.service and vtty-frontend-seat@seat0@mysession2.service is also possible to allow 2 sessions on seat0.
 
 
-Using vtty-seatmanager.service is recommended though, instead of hardcoding that.
-It detects the running seats, and it starts sessions on them.
+  Using vtty-seatmanager.service is recommended though, instead of hardcoding that.
+  It detects the running seats, and it starts sessions on them.
 
 ============================================================================================================================
 recinit
