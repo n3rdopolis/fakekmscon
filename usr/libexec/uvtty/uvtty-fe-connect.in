@@ -84,7 +84,7 @@ function UvTTYFeConnectMain
     done
   fi
 
-  #Prefer the user's .config/vtty/kanshiconfig.conf if it exists
+  #Prefer the user's .config/uvtty/kanshiconfig.conf if it exists
   if [[ -e "$HOME/.config/uvtty/kanshiconfig.conf" ]]
   then
     KANSHI_CONFIG_FILE="$HOME/.config/uvtty/kanshiconfig.conf"
