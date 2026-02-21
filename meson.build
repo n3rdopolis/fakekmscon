@@ -211,9 +211,9 @@ service_files = [
   'recinit-emergency.service',
   'recinit-rescue.service',
   'vtty-frontend@.service',
-  'vtty-backend-seat@.service',
+  'vtty-backend-vt@.service',
   'vtty-backend@.service',
-  'vtty-frontend-seat@.service',
+  'vtty-frontend-vt@.service',
   'vtty-seatmanager.service',
 ]
 

@@ -16,17 +16,17 @@ There are several different components
       There is the vtty-seatmanager service as well that can replace display-manager.service for systems without any other display managers, or display servers, or desktop environments.
 
 
-  Administrators on VT-enabled kernels can use vttys by running `ln -s /usr/lib/systemd/system/vtty-frontend@.service /etc/systemd/system/autovt@.service` to replace the default gettys.
-  Because of systemd parameters, the vtty-backend@.service and vtty-frontend@.service pair up with each other, and are for when seat0 is running on a kernel with VTs.
+  Administrators on VT-enabled kernels can use vttys by running `ln -s /usr/lib/systemd/system/vtty-frontend-vt@.service /etc/systemd/system/autovt@.service` to replace the default gettys.
+  Because of systemd parameters, the vtty-backend-vt@.service and vtty-frontend-vt@.service pair up with each other, and are for when seat0 is running on a kernel with VTs.
 
   More of the focus now is for VT-less kernels these days, so this configuration is not maintained as much, but this can allow for testing without changing the kernel.
 
 
-  vtty-backend-seat@.service and vtty-frontend-seat@.service are for VT-less seats, including seat0 when there are no VTs (A VT-less kernel)
+  vtty-backend@.service and vtty-frontend@.service are for VT-less seats, including seat0 when there are no VTs (A VT-less kernel)
   It takes the seat as the parameter. However the seat can be followed by a "@" with a comment, to allow a second instance on the seat.
 
-  Enabling vtty-frontend-seat@seat0.service is possible, to allow a singular instance on seat0.
-  Enabling vtty-frontend-seat@seat0@mysession1.service and vtty-frontend-seat@seat0@mysession2.service is also possible to allow 2 sessions on seat0.
+  Enabling vtty-frontend@seat0.service is possible, to allow a singular instance on seat0.
+  Enabling vtty-frontend@seat0@mysession1.service and vtty-frontend@seat0@mysession2.service is also possible to allow 2 sessions on seat0.
 
 
   Using vtty-seatmanager.service is recommended though, instead of hardcoding that.
@@ -60,8 +60,8 @@ vtty-seatmanager
   It starts up to NAutoVTs (configured in logind) instances on a seat. logind typically defaults to 6.
   logind can be changed to add more or less, using /etc/systemd/logind.conf .
 
-  For seat0, it will start at vtty-frontend-seat@seat0@vtty1.service
-  and by default, it will go up to vtty-frontend-seat@seat0@vtty6.service 
+  For seat0, it will start at vtty-frontend@seat0@vtty1.service
+  and by default, it will go up to vtty-frontend@seat0@vtty6.service 
 
   Upon start, it only starts the first instance on the seat.
 
