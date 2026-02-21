@@ -2,6 +2,9 @@ This project uses a wayland display server and a wayland based terminal emulator
 
 Instead of a terminal emulator being in kernel mode, the terminal emulators are in user space, and except for the recovery consoles, they run as a non-root user.
 
+[Warning] It is not recommended to install with sddm v0.21. The multiseat handling is broken. It is fixed in SDDM's branch, which is yet to be tagged.
+          Debian ships sddm with these fixes. The seat-vtty seat created for the vtty sessions is seen as a second seat by display managers.
+
 ============================================================================================================================
 
 There are several different components
@@ -124,7 +127,13 @@ Configuring
 
   /etc/vtty/kanshiconfig.conf: This configures the kanshi daemon that enforces cage to be in clone mode.
     This is applicable in recinit, vTTYs, and UvTTYs
-    Users can replace this with their own ~/.config/uvtty/kanshiconfig.conf, but this is less-likely to be needed.
+    Users can provide their their own ~/.config/uvtty/kanshiconfig.conf, but this is less-likely to be needed over footkiosk.conf.
+
+  /etc/vconsole.conf: This is a system-wide file maintained by systemd-localed, and has gotten pretty standard. Keyboard settings are handled from this file
+    Users can provide their own ~/.config/uvtty/vconsole.conf file however though for their UvTTY sessions.
+
+  In the same vein as the vconsole.keymap= option would be handled for the kernel mode console
+  the kernel command line arguments vconsole.xkblayout=, vconsole.xkbmodel=, vconsole.xkbvariant=, vconsole.xkboptions= are also handled by recinit, vTTYs and UvTTYs
 
 ============================================================================================================================
 
