@@ -145,3 +145,4 @@ Requirements and dependencies
   wl-clipboard     (for vTTYs to be able to clear the clipboard upon the next prompt for user log in)
   kanshi 1.9.0+    (for setting the cage multi-outputs to clone mode)
   libnet-dbus-perl (for vtty-seatmanager's interactions with dbus)
+  pkexec           (for vtty-launch)
