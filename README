@@ -140,9 +140,22 @@ Configuring
 Requirements and dependencies
 
   cage             (the display server)
+                   https://github.com/cage-kiosk/cage
+
   foot             (the terminal emulator)
+                   https://codeberg.org/dnkl/foot/
+
   socat            (The client/server utility)
+                   https://repo.or.cz/socat.git
+
   wl-clipboard     (for vTTYs to be able to clear the clipboard upon the next prompt for user log in)
+                   https://github.com/bugaevc/wl-clipboard
+
   kanshi 1.9.0+    (for setting the cage multi-outputs to clone mode)
+                   https://gitlab.freedesktop.org/emersion/kanshi
+
   libnet-dbus-perl (for vtty-seatmanager's interactions with dbus)
-  pkexec           (for vtty-launch)
+                   https://gitlab.com/berrange/perl-net-dbus
+
+  pkexec           (for vtty-launch (from polkit))
+                   https://github.com/polkit-org/polkit
