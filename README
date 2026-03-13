@@ -1,3 +1,5 @@
+ReterminateVT (was fakekmscon)
+
 ReterminateVT uses a wayland display server and a wayland based terminal emulator to bring a full screen terminal experiance in userspace, for kernels without VTs
 
 Instead of a terminal emulator being in kernel mode, the terminal emulators are in user space, and except for the recovery consoles, they run as a non-root user.
