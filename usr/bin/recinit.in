@@ -265,8 +265,8 @@ RecinitMain()
   export WLR_DRM_DEVICES=$(GetFirstSeatCard)
 
   @cagebinaryname@ -d -s -- \
-  foot --config="$XDG_CONFIG_HOME"/footkiosk.conf --override=scrollback.lines=10000  -- \
-  sh -c "kanshi -c \"$XDG_CONFIG_HOME\"/kanshiconfig.conf >/dev/null 2>/dev/null & LC_ALL=$LC_ALL_REAL $RUNCOMMAND; pkill -9 -P $RECINITPID @cagebinaryname@" > /dev/null 2>&1
+  foot --config="$XDG_CONFIG_HOME/footkiosk.conf" --override=scrollback.lines=10000  -- \
+  sh -c "kanshi -c \"$XDG_CONFIG_HOME/kanshiconfig.conf\" >/dev/null 2>/dev/null & LC_ALL=$LC_ALL_REAL $RUNCOMMAND; pkill -9 -P $RECINITPID @cagebinaryname@" > /dev/null 2>&1
 
   if [ $udev_result -ne 0 ]
   then

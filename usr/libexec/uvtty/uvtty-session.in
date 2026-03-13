@@ -44,8 +44,8 @@ function UvTTYSessionMain
   fi
   mkfifo -m 600 "$XDG_RUNTIME_DIR/uvtty/$UvTTYName/ptycommandproxy"
 
-  @libexecdir@/uvtty/uvtty-frontend $UvTTYName &
-  @libexecdir@/uvtty/uvtty-backend $UvTTYName
+  "@libexecdir@/uvtty/uvtty-frontend" "$UvTTYName" &
+  "@libexecdir@/uvtty/uvtty-backend" "$UvTTYName"
   exit
 }
 
