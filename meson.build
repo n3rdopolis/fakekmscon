@@ -1,5 +1,5 @@
 project(
-  'fakekmscon',
+  'reterminatevt',
   version: '0000-00-00',
   meson_version: '>= 1.10.0',  # for build_subdir
   license: 'GPLv2+',
