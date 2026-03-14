@@ -1,5 +1,5 @@
 ReterminateVT (was fakekmscon)
-https://github.com/n3rdopolis/ReterminateVT
+  https://github.com/n3rdopolis/ReterminateVT
 
 ReterminateVT uses a wayland display server and a wayland based terminal emulator to bring a full screen terminal experiance in userspace, for kernels without VTs
 
