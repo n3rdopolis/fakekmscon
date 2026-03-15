@@ -138,12 +138,20 @@ Configuring
   In the same vein as the vconsole.keymap= option would be handled for the kernel mode console
   the kernel command line arguments vconsole.xkblayout=, vconsole.xkbmodel=, vconsole.xkbvariant=, vconsole.xkboptions= are also handled by recinit, vTTYs and UvTTYs
 
+  Booting with vttyaccessible forces vTTYs to use the Fenrir screen reader
+  Booting with uvttyaccessible forces UvTTYs to use the Fenrir screen reader
+  Creating a /etc/vtty/accessiblemode file (can be empty) makes the vTTYs use the screen reader, and the UvTTYs for all users use the screen reader
+  Creating a ~/.config/uvtty/accessiblemode file (can be empty) makes the UvTTYs use the screen reader for the current user.
+
 ============================================================================================================================
 
 Requirements and dependencies
 
   cage             (the display server)
                    https://github.com/cage-kiosk/cage
+
+  fenrir           (The screen reader, only for accessible mode)
+                   https://git.stormux.org/storm/fenrir
 
   foot             (the terminal emulator)
                    https://codeberg.org/dnkl/foot/

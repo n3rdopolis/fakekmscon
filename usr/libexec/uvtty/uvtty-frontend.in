@@ -149,9 +149,32 @@ function UvTTYFrontendMain
     #Workaround for https://gitlab.freedesktop.org/wlroots/wlroots/-/issues/4040
     export WLR_DRM_DEVICES=$(GetFirstSeatCard)
 
-    @cagebinaryname@ -d -s -- \
-    foot --config="$FOOT_CONFIG_FILE" -- \
-    "@libexecdir@/uvtty/uvtty-fe-connect" &
+    UvTTYAccessibleMode=0
+    if [[ -e "@sysconfdir@/accessiblemode" ]]
+    then
+      UvTTYAccessibleMode=1
+    fi
+    if [[ -e "$HOME/.config/uvtty/accessiblemode" ]]
+    then
+      UvTTYAccessibleMode=1
+    fi
+    read -r -n 16385 -d $'\r' KernelCommandLine </proc/cmdline
+    if [[ $KernelCommandLine =~ ([[:space:]]|^)"uvttyaccessible"([[:space:]]|$) ]]
+    then
+      UvTTYAccessibleMode=1
+    fi
+
+
+    if [[ $UvTTYAccessibleMode == 1 ]]
+    then
+      @cagebinaryname@ -d -s -- \
+      foot --config="$FOOT_CONFIG_FILE" -- \
+      fenrir -e -o general#shell="@libexecdir@/uvtty/uvtty-fe-connect" &
+    else
+      @cagebinaryname@ -d -s -- \
+      foot --config="$FOOT_CONFIG_FILE" -- \
+      "@libexecdir@/uvtty/uvtty-fe-connect" &
+    fi
     CAGEPID=$!
 
     mkdir -p "$XDG_RUNTIME_DIR/uvtty/$UvTTYName"
