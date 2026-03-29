@@ -139,7 +139,11 @@ Configuring
   the kernel command line arguments vconsole.xkblayout=, vconsole.xkbmodel=, vconsole.xkbvariant=, vconsole.xkboptions= are also handled by recinit, vTTYs and UvTTYs
 
   Booting with vttyaccessible forces vTTYs to use the Fenrir screen reader
+  Booting with novttyaccessible disables the Fenrir screen reader in vTTYs
+
   Booting with uvttyaccessible forces UvTTYs to use the Fenrir screen reader
+  Booting with nouvttyaccessible disables the Fenrir screen reader in UvTTYs
+
   Creating a /etc/vtty/accessiblemode file (can be empty) makes the vTTYs use the screen reader, and the UvTTYs for all users use the screen reader
   Creating a ~/.config/uvtty/accessiblemode file (can be empty) makes the UvTTYs use the screen reader for the current user.
 
