@@ -150,7 +150,7 @@ function UvTTYFrontendMain
     export WLR_DRM_DEVICES=$(GetFirstSeatCard)
 
     UvTTYAccessibleMode=0
-    if [[ -e "@sysconfdir@/accessiblemode" ]]
+    if [[ -e "@sysconfdir@/vtty/accessiblemode" ]]
     then
       UvTTYAccessibleMode=1
     fi
@@ -166,6 +166,11 @@ function UvTTYFrontendMain
 
     #boot option to disable accessible mode, in case if speech-dispatcher or fenrir fail to work.
     if [[ $KernelCommandLine =~ ([[:space:]]|^)"nouvttyaccessible"([[:space:]]|$) ]]
+    then
+      UvTTYAccessibleMode=0
+    fi
+    #Some distributions might want these to be an optional dependency
+    if ! command -v speech-dispatcher > /dev/null 2>&1 || ! command -v fenrir > /dev/null 2>&1
     then
       UvTTYAccessibleMode=0
     fi
