@@ -138,8 +138,8 @@ Configuring
   In the same vein as the vconsole.keymap= option would be handled for the kernel mode console
   the kernel command line arguments vconsole.xkblayout=, vconsole.xkbmodel=, vconsole.xkbvariant=, vconsole.xkboptions= are also handled by recinit, vTTYs and UvTTYs
 
-  Booting with vttyaccessible forces vTTYs to use the Fenrir screen reader
-  Booting with novttyaccessible disables the Fenrir screen reader in vTTYs
+  Booting with vttyaccessible forces vTTYs and recinit to use the Fenrir screen reader
+  Booting with novttyaccessible disables the Fenrir screen reader in vTTYs and in recinit
 
   Booting with uvttyaccessible forces UvTTYs to use the Fenrir screen reader
   Booting with nouvttyaccessible disables the Fenrir screen reader in UvTTYs
@@ -150,6 +150,9 @@ Configuring
 ============================================================================================================================
 
 Requirements and dependencies
+
+  alsa-utils       (Alsa utilities, only for recinit accessible mode)
+                   https://github.com/alsa-project/alsa-utils
 
   cage             (the display server)
                    https://github.com/cage-kiosk/cage
