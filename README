@@ -83,7 +83,11 @@ vtty-seatmanager
 
 vTTY
 
-  The vttys are started by systemd. There are two components, the backend, and the frontend.
+  The vttys are started by systemd, either with fixed services, or by vtty-seatmanager
+
+  They are intended for systems that do not have a full featured display manager, or for recovery.
+
+  There are two components, the backend, and the frontend.
 
   The backend runs a getty (or other command) under a socat instance. This allows the getty prompt to run as root without setuid.
   It also allows the commands to be resillent if the frontend ever crashes, the user sessions remain running..
@@ -107,16 +111,13 @@ vTTY
 
 UvTTY
 
-  The principals are similar for UvTTY as it is for vTTY.
-
-  They are client-server like vTTYs, however the server and the client run as the same user, and the backend starts the user's $SHELL instead of a getty.
-
+  UvTTYs are socat client-server's like vTTY, however the server and the client run as the same user, and the backend starts the user's $SHELL instead of a getty.
 
   /usr/share/wayland-sessions/fullscreenterminal.desktop is a "wayland session" that when selected from under a full-featured login manager, starts a UvTTY session
 
-  This is for users who want to log into a full screen terminal experiance
-
   Users who want to run or test or develop display servers, can use uvtty-launch, very similar to vtty-launch.
+
+  UvTTYs are for a full screen terminal session on systems with a full-featured display manager
 
 ============================================================================================================================
 
