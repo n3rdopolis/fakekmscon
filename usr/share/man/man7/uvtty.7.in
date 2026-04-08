@@ -1,0 +1,120 @@
+'\" t
+.TH "UvTTY" "7" "" "uvtty"
+.\" -----------------------------------------------------------------
+.\" -----------------------------------------------------------------
+.SH "NAME"
+UvTTY - User session terminal session
+.SH "DESCRIPTION"
+.B uvtty
+is very similar to
+.BR vtty (7)
+only a UvTTY runs as the user, instead of from system services.
+Namely a
+.BR socat (1)
+server, of which instead of starting a getty as root,
+.B uvtty-session
+starts the user's desired shell on the pty socat creates. And 
+then starts a
+.BR socat (1)
+client that runs under the
+.BR foot (1)
+terminal emulator, of which runs under wlroots-based
+.BR cage (1)
+Wayland server, that also runs as the user.
+.SH "STARTING"
+To start a UvTTY, typically from your display manager, select the
+.B Fullscreen Terminal
+wayland session option, and then log in.
+.SH "STARTING OTHER DISPLAY SERVERS"
+It is possible to start display servers, (or anything that uses
+/dev/dri/cardX or /dev/fbX) from a UvTTY using the
+.BR uvtty-launch (1)
+command. The frontend is temporarily suspended by
+.B uvtty-launch
+to allow the desired program to take control, such as
+.B startx
+or
+.B weston
+and the like.
+.SH "ACCESSIBILITY"
+.B uvtty
+supports an optional accessible mode, where all the text is
+read by the fenrir screen reader.
+.SH "CONFIGURATION"
+.PP
+.B @sysconfdir@/vtty/kanshiconfig.conf
+is the configuration file for a small daemon that ensures that
+.BR cage (1)
+uses clone mode. This can be overridden by
+.B ~/.config/uvtty/kanshiconfig.conf
+for per-user settings.
+.PP
+By creating a
+.B @sysconfdir@/vtty/accessiblemode
+file. (it can be empty), enables the accessible mode for all users.
+Creating a
+.B ~/.config/uvtty/accessiblemode
+file enables accessible mode for one user.
+.PP
+.B @sysconfdir@/vtty/footkiosk.conf
+is the configuration for the
+.BR foot (1)
+terminal emulator.  This can be overridden by
+.B ~/.config/uvtty/footkiosk.conf
+for per-user settings.
+.PP
+The directory
+.B @sysconfdir@/vtty/
+is set as
+.B $XDG_CONFIG_HOME
+so that any other library configuration files, like
+.B ~/.config/xkb
+can be set by an administrator. This is applicable to the frontend
+only, not the user processes running on the backend.
+.SH "BOOT OPTIONS"
+.IP \[bu]
+.B vconsole.xkblayout=
+.RS 12
+Sets
+.B XKBLAYOUT
+for the UvTTYs.
+.RE
+.IP \[bu]
+.B vconsole.xkbmodel=
+.RS 12
+Sets
+.B XKBMODEL
+for the UvTTYs.
+.RE
+.IP \[bu]
+.B vconsole.xkbvariant=
+.RS 12
+Sets
+.B XKBVARIANT
+for the UvTTYs.
+.RE
+.IP \[bu]
+.B vconsole.xkboptions=
+.RS 12
+Sets
+.B XKBOPTIONS
+for the UvTTYs.
+.RE
+.IP \[bu]
+.B vttyaccessible
+.RS 12
+Enables accessibility mode for the UvTTYs.
+.RE
+.IP \[bu]
+.B novttyaccessible
+.RS 12
+Disables accessibility mode for for the UvTTYs. This always takes
+precedence so that in case there is a problem with
+.BR fenrir (1)
+the system is not unusable.
+.RE
+
+.SH NOTES
+Only the first GPU in the seat is used. The UvTTYs will not span to screens on the second card.
+.SH See Also:
+.BR uvtty-launch (1)

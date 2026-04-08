@@ -1,0 +1,63 @@
+'\" t
+.TH "seat-vtty" "7" "" "seat-vtty"
+.\" -----------------------------------------------------------------
+.\" -----------------------------------------------------------------
+.SH "NAME"
+seat-vtty - logind seat
+.SH "DESCRIPTION"
+.B seat-vtty
+is a logind seat, created by the 
+.B @udevrulesdir@/72-seat-vtty.rules
+file, by assigning the virtual
+.B /dev/tty
+file to the seat. 
+
+.SH "/dev/tty on seat-vtty"
+The device file
+.B /dev/tty
+is configured to be added to the \fBseat-vtty\fR seat as this device
+file exists on all Linux systems, and represents the terminal or
+pseudoterminal of the current process (if any), therefore, there are no
+effective permissions changes to
+.B /dev/tty
+for processes running and assigned to the
+.B seat-vtty
+seat. 
+.PP
+udev is configured
+to set the 
+.B master-of-seat
+and
+.B seat
+properties to the
+.B /dev/tty
+file, so udev adds it to
+.B seat-vtty
+so that logind actually creates the
+.B seat-vtty
+seat.
+
+.SH "seat-vtty"
+While most seats have various hardware devices like mice, keyboards,
+and GPUs assigned to it,
+.B seat-vtty
+has no hardware assigned to it. The reason for the
+.B seat-vtty
+seat is for
+.BR polkit (8)
+access. The vtty backend starts a getty with 
+\fBXDG_SEAT\fR=\fIseat\-vtty\fR set so that the session starts on
+\fBseat-vtty\fR with complete polkit access, instead of those
+of a remote session. This allows commands such as
+.BR nmtui (1),
+.BR pkexec (1),
+.BR udisksctl (1),
+and the like to work with complete permissions.
+Furthermore 
+.BR polkit (8)
+is configued so that
+.BR vtty-launch (1)
+only works on \fBseat-vtty\fR.
+.SH "See Also"
+.BR vtty (7),
+.BR vtty-launch (1)

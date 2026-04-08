@@ -377,3 +377,61 @@ configure_file(
   build_subdir: 'usr_share_polkit-1_rules.d',
   install_dir: get_option('prefix') / get_option('datadir') / 'polkit-1/rules.d',
 )
+
+
+configure_file(
+  input: 'usr/share/man/man1/uvtty-launch.1.in',
+  output: 'uvtty-launch.1',
+  configuration: conf_data,
+  build_subdir: 'usr_share_man_man1',
+  install_dir: get_option('prefix') / get_option('datadir') / 'man/man1',
+)
+configure_file(
+  input: 'usr/share/man/man1/vtty-launch.1.in',
+  output: 'vtty-launch.1',
+  configuration: conf_data,
+  build_subdir: 'usr_share_man_man1',
+  install_dir: get_option('prefix') / get_option('datadir') / 'man/man1',
+)
+configure_file(
+  input: 'usr/share/man/man7/reterminatevt.7.in',
+  output: 'reterminatevt.7',
+  configuration: conf_data,
+  build_subdir: 'usr_share_man_man7',
+  install_dir: get_option('prefix') / get_option('datadir') / 'man/man7',
+)
+configure_file(
+  input: 'usr/share/man/man7/seat-vtty.7.in',
+  output: 'seat-vtty.7',
+  configuration: conf_data,
+  build_subdir: 'usr_share_man_man7',
+  install_dir: get_option('prefix') / get_option('datadir') / 'man/man7',
+)
+configure_file(
+  input: 'usr/share/man/man7/uvtty.7.in',
+  output: 'uvtty.7',
+  configuration: conf_data,
+  build_subdir: 'usr_share_man_man7',
+  install_dir: get_option('prefix') / get_option('datadir') / 'man/man7',
+)
+configure_file(
+  input: 'usr/share/man/man7/vtty.7.in',
+  output: 'vtty.7',
+  configuration: conf_data,
+  build_subdir: 'usr_share_man_man7',
+  install_dir: get_option('prefix') / get_option('datadir') / 'man/man7',
+)
+configure_file(
+  input: 'usr/share/man/man8/recinit.8.in',
+  output: 'recinit.8',
+  configuration: conf_data,
+  build_subdir: 'usr_share_man_man8',
+  install_dir: get_option('prefix') / get_option('datadir') / 'man/man8',
+)
+configure_file(
+  input: 'usr/share/man/man8/vtty-seatmanager.8.in',
+  output: 'vtty-seatmanager.8',
+  configuration: conf_data,
+  build_subdir: 'usr_share_man_man8',
+  install_dir: get_option('prefix') / get_option('datadir') / 'man/man8',
+)

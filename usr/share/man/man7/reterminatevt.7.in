@@ -1,0 +1,56 @@
+'\" t
+.TH "ReterminateVT" "7" "" "reterminatevt"
+.\" -----------------------------------------------------------------
+.\" -----------------------------------------------------------------
+.SH "NAME"
+reterminatevt - User Mode VT Replacement Terminals
+.SH "DESCRIPTION"
+ReterminateVT provides consoles on Linux systems that do not provide
+the legacy VTs, to instead present the consoles with user mode instead.
+.PP
+ReterminateVT consists of three main components, for three different
+cases where a terminal is needed:
+.IP \[bu]
+vTTY:
+.RS 12
+.BR vtty (7)
+is intended for minimal systems that do not have a display manager, or
+for failure conditions. (For example, a display-manager.service can set
+\fBOnFailure\fR to \fBvtty-frontend@seat0.service\fR). Semi-headless
+servers that would otherwise have the default
+.B getty@.service
+enabled, can have
+.B vtty-frontend@seat0.service
+or
+.B vtty-seatmanager.service
+enabled instead.
+.RE
+.IP \[bu]
+UvTTY:
+.RS 12
+.BR uvtty (8)
+is similar to vtty, however it is intended to be selected as a wayland
+session from a display manager, for users who desire to only log in to
+a fullscreen terminal, or test and develop display servers with
+.B uvtty-launch
+without starting a vtty over the display manager.
+.RE
+.IP \[bu]
+recinit:
+.RS 12
+.BR recinit (8)
+is for emergency fallback shells, either to start when an
+initrd fails to mount the filesystem, or can be used to replace
+.B init=/bin/bash
+with
+.B init=/sbin/recinit
+for instance.
+.RE
+.SH See Also:
+.BR vtty (7),
+.BR uvtty (7),
+.BR recinit (8),
+.BR vtty-launch (1),
+.BR uvtty-launch (1),
+.BR vtty-seatmanager (8),
+.BR seat-vtty (7)

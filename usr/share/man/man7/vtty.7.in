@@ -1,0 +1,149 @@
+'\" t
+.TH "vTTY" "7" "" "vtty"
+.\" -----------------------------------------------------------------
+.\" -----------------------------------------------------------------
+.SH "NAME"
+vTTY - User session terminal session
+.SH "DESCRIPTION"
+.B vtty
+is very similar to
+.BR uvtty (7)
+only a vTTY runs as system services, instead of as a user. Namely a
+.BR socat (1)
+server, of which instead of the user's desired shell, it starts a getty
+in the backend service on the pty, of which runs as root, and the
+.BR socat (1)
+client that runs under the
+.BR foot (1)
+terminal emulator, of which runs under wlroots-based
+.BR cage (1)
+Wayland server, that runs in the frontend service, that runs as a
+non-root system user.
+.SH "STARTING"
+The vtty units are parameterized systemd units, but Starting the
+frontend service starts the backend service. The parameter is the seat
+name of which to start the frontend on, until the next (optional)
+instance name for that seat. For example:
+.RS 4
+systemctl start vtty-frontend@seat0.service
+.RE
+starts on
+.B seat0
+and
+.RS 4
+systemctl start vtty-frontend@seat0@instance1.service
+.RE
+will also start an instance on
+.B seat0
+but the service instance name will be
+.B seat0@instance1
+so that multiple instances of vTTYs can be started on one seat.
+.PP
+The instance name portion is not treated specially by the vTTYs, but it
+does allow multiple instances to be managed, and started on a single
+seat.
+.BR vtty-seatmanager (8)
+does so by naming its instances
+.B vtty1,
+.B vtty2,
+and so on.
+.SH "STARTING OTHER DISPLAY SERVERS"
+It is possible to start display servers, (or anything that uses
+/dev/dri/cardX or /dev/fbX) from a vTTY using the
+.BR vtty-launch (1)
+command. The frontend is temporarily suspended by
+.B vtty-launch
+to allow the desired program to take control, such as
+.B startx
+or
+.B weston
+and the like.
+.SH "REPLACING autovt@.service"
+On kernels that still have VTs, it is possible to link
+.B vtty-frontend-vt@.service
+as
+.B autovt@.service
+to replace the kernel console. However
+.B vtty-launch
+will \fBnot\fR work on seats \fBwith\fR VTs.
+.SH "ACCESSIBILITY"
+.B vtty
+supports an optional accessible mode, where all the text is
+read by the fenrir screen reader.
+.SH "CONFIGURATION"
+.PP
+.B @sysconfdir@/vtty/kanshiconfig.conf
+is the configuration file for a small daemon that ensures that
+.BR cage (1)
+uses clone mode.
+.PP
+By creating a
+.B @sysconfdir@/vtty/accessiblemode
+file. (it can be empty), enables the accessible mode.
+.PP
+.B @sysconfdir@/vtty/footkiosk.conf
+is the configuration for the
+.BR foot (1)
+terminal emulator.
+.PP
+The directory
+.B @sysconfdir@/vtty/
+is set as
+.B $XDG_CONFIG_HOME
+so that any other library configuration files, like
+.B ~/.config/xkb
+can be set by an administrator. This is applicable to the frontend
+only, not the user processes running on the backend service.
+.PP
+Adding a
+.B vtty-login-program
+to the
+.B $PATH
+overrides the usage of getty, and the vtty instead starts that. It can be a symlink to another binary, such as
+.B console-conf
+.SH "BOOT OPTIONS"
+.IP \[bu]
+.B vconsole.xkblayout=
+.RS 12
+Sets
+.B XKBLAYOUT
+for the vTTYs.
+.RE
+.IP \[bu]
+.B vconsole.xkbmodel=
+.RS 12
+Sets
+.B XKBMODEL
+for the vTTYs.
+.RE
+.IP \[bu]
+.B vconsole.xkbvariant=
+.RS 12
+Sets
+.B XKBVARIANT
+for the vTTYs.
+.RE
+.IP \[bu]
+.B vconsole.xkboptions=
+.RS 12
+Sets
+.B XKBOPTIONS
+for the vTTYs.
+.RE
+.IP \[bu]
+.B vttyaccessible
+.RS 12
+Enables accessibility mode for the vTTYs.
+.RE
+.IP \[bu]
+.B novttyaccessible
+.RS 12
+Disables accessibility mode for for the vTTYs. This always takes
+precedence so that in case there is a problem with
+.BR fenrir (1)
+the system is not unusable.
+.RE
+.SH NOTES
+Only the first GPU in the seat is used. The vTTYs will not span to screens on the second card.
+.SH See Also:
+.BR vtty-launch (1)

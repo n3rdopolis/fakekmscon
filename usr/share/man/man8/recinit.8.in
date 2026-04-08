@@ -1,0 +1,125 @@
+'\" t
+.TH "RECovery INIT" "8" "" "recinit"
+.\" -----------------------------------------------------------------
+.\" -----------------------------------------------------------------
+.SH "NAME"
+recinit - \fBRec\fRovery \fBInit\fR
+.SH "DESCRIPTION"
+.B recinit
+is a script that runs as root, to provide a recovery shell on systems
+without VTs. It starts an instance of the wlroots-based wayland server
+.BR cage (1)
+which starts the
+.BR foot (1)
+terminal emulator, which then starts an applicable command.
+.SH "STARTUP AND USAGE"
+.B recinit
+can be run at early system startup by specifying
+.B init=/bin/recinit
+on the kernel command line.
+.PP
+.B recinit
+also starts when the initrd fails. As of now, there are initrd hooks
+for
+.BR dracut (8),
+.BR mkinitcpio (8),
+and
+.BR initramfs-tools (7)
+that install the needed files for
+.B recinit
+to run, as well as intercept the initrd panic routine so that instead
+of trying to start the shell, it starts
+.B recinit
+instead, provided that there are no VTs. The panic routine is run
+typically by the initrd system when it fails to mount the rootfs, or
+an option like
+.B break=top
+is specified to the kernel. (This example is for
+.B initramfs-tools
+initrds.)
+.PP
+.B recinit
+also starts when
+.BR systemd (1)
+hits the
+.B emergency
+or
+.B rescue
+targets.
+.PP
+.B recinit
+is not typically manually invoked by users, except for the
+.B init=/bin/recinit
+option.
+.SH "ACCESSIBILITY"
+.B recinit
+supports an optional accessible mode, where all the text is
+read by the fenrir screen reader.
+.SH "CONFIGURATION"
+.B @sysconfdir@/vtty/kanshiconfig.conf
+is the configuration file for a small daemon that ensures that
+.BR cage (1)
+uses clone mode.
+.PP
+By creating a
+.B @sysconfdir@/vtty/accessiblemode
+file. (it can be empty), enables the accessible mode.
+.PP
+.B @sysconfdir@/vtty/footkiosk.conf
+is the configuration for the
+.BR foot (1)
+terminal emulator.
+.PP
+The directory
+.B @sysconfdir@/vtty/
+is set as
+.B $XDG_CONFIG_HOME
+so that any other library configuration files, like
+.B ~/.config/xkb
+can be set by an administrator.
+.SH "BOOT OPTIONS"
+.IP \[bu]
+.B vconsole.xkblayout=
+.RS 12
+Sets
+.B XKBLAYOUT
+for recinit.
+.RE
+.IP \[bu]
+.B vconsole.xkbmodel=
+.RS 12
+Sets
+.B XKBMODEL
+for recinit.
+.RE
+.IP \[bu]
+.B vconsole.xkbvariant=
+.RS 12
+Sets
+.B XKBVARIANT
+for recinit.
+.RE
+.IP \[bu]
+.B vconsole.xkboptions=
+.RS 12
+Sets
+.B XKBOPTIONS
+for recinit.
+.RE
+.IP \[bu]
+.B vttyaccessible
+.RS 12
+Enables accessibility mode for recinit. 
+.RE
+.IP \[bu]
+.B novttyaccessible
+.RS 12
+Disables accessibility mode for recinit. This always takes precedence
+so that in case there is a problem with
+.BR fenrir (1)
+the system is not unusable.
+.RE
+.SH NOTES
+Only the first GPU in the seat is used. Recinit will not span to
+screens on the second card.
+

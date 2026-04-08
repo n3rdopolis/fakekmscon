@@ -1,0 +1,84 @@
+'\" t
+.TH "vTTY-SeatManager" "8" "" "vtty-seatmanager"
+.\" -----------------------------------------------------------------
+.\" -----------------------------------------------------------------
+.SH "NAME"
+vtty-seatmanager - vTTY 'display' manager
+.SH "DESCRIPTION"
+.B vtty-seatmanager
+is a service that runs in place of a display manager to start one
+or more vTTY instances on each graphical capable seat.
+.SH "STARTUP AND USAGE"
+.B vtty-seatmanager
+can be set to start at boot, by enabling the
+.B vtty-seatmanager.service
+where it will then be linked as the
+.B display-manager.service
+.PP
+Upon startup, a default vtty instance is started on all available
+seats. If a user logs into the getty, the vtty instance is seen as
+in-use. Once in use, if a second instance is needed (similar to
+switching to tty2, or tty3, etc) pressing the
+.B SecureAttentionKey
+for
+.BR systemd-logind(1),
+which is usually
+.B Ctrl+Alt+Shift+Esc,
+causes a second instance to be started on the seat.
+.PP
+If the user's session on the first instance is logged off, pressing
+the
+.B SecureAttentionKey
+sequence again will switch to the first instance, allowing a user to
+login.
+.PP
+If both instances are still in use, and the
+.B SecureAttentionKey
+sequence is pressed again, it starts a 3rd instance with a getty.
+.PP
+.B vtty-seatmanager
+queries logind's
+.B NAutoVTs
+attribute for the maximum number of sessions to create. This can be set
+in
+.BR logind.conf(5)
+.RS 4
+Note that
+.B vtty-seatmanager
+does not parse the logind config file directly, but uses logind's dbus
+interface to get this value.
+.RE
+.RS 4
+Note that logind's default value for this option is typically 6.
+.RE
+.PP
+If the maximum number of instances have been created, and all are in
+use,
+.B vtty-seatmanager
+will then cycle through all the instances when the
+.B SecureAttentionKey
+sequence is pressed.
+.SH "CONFIGURATION"
+.B vtty-seatmanager
+has no config files of its own. The only configurable option is the
+maximum number of vTTY instances that it will create on a seat, with
+the
+.B NAutoVTs
+option in \fBlogind\fR. See the 
+.B NAutoVTs
+option in
+.BR logind.conf(5)
+and note that
+.B vtty-seatmanager
+does not parse the config file itself, but queries through dbus, so
+a daemon reload of
+.B logind
+may be needed for changes to take effect, as well as a restart of the
+.B vtty-seatmanager.
+.PP
+It is recommended to keep this value at 12 or fewer, as most keyboards
+max out at
+.B Ctrl+Alt+F12
+for session switching.
+.SH See Also:
+.BR vtty (7)

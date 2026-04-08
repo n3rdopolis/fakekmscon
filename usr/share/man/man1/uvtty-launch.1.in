@@ -1,0 +1,74 @@
+'\" t
+.TH "UvTTY-LAUNCH" "1" "" "uvtty-launch"
+.\" -----------------------------------------------------------------
+.\" -----------------------------------------------------------------
+.SH "NAME"
+uvtty-launch - UvTTY Program Launcher
+.PP
+.SH "DESCRIPTION"
+.PP
+\fBuvtty\-launch\fR
+suspends the current UvTTY frontend, and starts a program it its place on
+the seat. Typically, the intended use is for starting another display
+server.
+.PP
+By default \fBuvtty\-launch\fR uninhibits the frontend when the called
+program quits, to allow the frontend to start back up again.
+.PP
+\fBuvtty\-launch\fR detects when there is no program using any modesetting
+device on the seat. When this happens, it uninhibits, even if the process
+is still running, even if \fB\-i\fP is specified. This is to prevent
+commands like
+.B sleep inf
+from making the session unusable.
+.PP
+.B uvtty-launch
+works similar to
+.BR vtty-launch (1)
+only it only works under user session UvTTYs, which are typically started
+from a display manager, as opposed to a system service.
+.SH "OPTIONS"
+.PP
+\fB\-i\fP, \fB\-\-inhibit\-after\-quit\fP
+.RS 4
+This option prevents \fBuvtty\-launch\fR from uninhibiting the frontend
+which would otherwise allow the frontend to start up again after the
+called process quits.
+.RE
+.PP
+.SH "EXAMPLE USAGES"
+.PP
+.B Starting Weston:
+.RS 4
+uvtty-launch weston
+.RE
+.RS 8
+or
+.RE
+.RS 4
+uvtty-launch -- weston
+.RE
+.RS 8
+or
+.RE
+.RS 4
+uvtty-launch -- weston --xwayland
+.RE
+.PP
+.B Starting Plymouth:
+.RE
+.RS 4
+sudo plymouthd
+.RE
+.RS 4
+uvtty-launch -i -- sudo plymouth show-splash
+.RE
+.PP
+.RE
+.B Starting X11:
+.RS 4
+uvtty-launch startx
+.RE
+.SH See Also:
+.BR uvtty (7),
+.BR vtty-launch (1)
