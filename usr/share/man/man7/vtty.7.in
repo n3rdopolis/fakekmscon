@@ -31,7 +31,7 @@ starts on
 .B seat0
 and
 .RS 4
-systemctl start vtty-frontend@seat0@instance1.service
+systemctl start vtty-frontend\@seat0\@instance1.service
 .RE
 will also start an instance on
 .B seat0
