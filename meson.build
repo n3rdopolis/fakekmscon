@@ -1,6 +1,6 @@
 project(
   'reterminatevt',
-  version: '0000-00-00',
+  version: '1.2026-06-02',
   meson_version: '>= 1.10.0',  # for build_subdir
   license: 'GPLv2+',
   license_files: 'COPYING.txt',
